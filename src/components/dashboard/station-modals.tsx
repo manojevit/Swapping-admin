@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import NextImage from "next/image";
 import QRCode from "react-qr-code";
-import { FileDown, Image as ImageIcon, Cpu } from "lucide-react";
+import { FileDown, Image as ImageIcon, Cpu, KeyRound, Copy, RefreshCw } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -213,6 +213,50 @@ export function BmsModal({ open, onClose, bay, stationCode }: { open: boolean; o
           </div>
         </div>
       )}
+    </Modal>
+  );
+}
+
+function makeToken() {
+  const seg = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `evx_${seg()}${seg()}`;
+}
+
+export function KeyModal({ open, onClose, stationCode }: { open: boolean; onClose: () => void; stationCode: string }) {
+  const { show } = useToast();
+  const [token, setToken] = useState(makeToken);
+
+  function rotate() {
+    setToken(makeToken());
+    show("Station key rotated", { description: "Old QR stickers for this station are now invalid." });
+  }
+  function copy() {
+    navigator.clipboard?.writeText(token).then(
+      () => show("Key copied to clipboard"),
+      () => show("Couldn't copy", { tone: "warn" }),
+    );
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      icon={<KeyRound className="h-5 w-5" />}
+      title={`${stationCode} · access key`}
+      description="The rotatable token embedded in this station's QR."
+      footer={
+        <>
+          <Button variant="secondary" onClick={copy}><Copy className="h-4 w-4" /> Copy</Button>
+          <Button variant="danger" onClick={rotate}><RefreshCw className="h-4 w-4" /> Rotate key</Button>
+        </>
+      }
+    >
+      <div className="rounded-xl border border-line bg-canvas/60 px-4 py-3">
+        <p className="nums break-all text-[14px] font-semibold text-ink">{token}</p>
+      </div>
+      <p className="mt-3 text-[12px] leading-relaxed text-muted">
+        Rotating the key invalidates the current QR everywhere — reprint this station&apos;s sticker afterwards. No other station is affected.
+      </p>
     </Modal>
   );
 }
