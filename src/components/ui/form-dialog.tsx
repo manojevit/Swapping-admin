@@ -59,7 +59,7 @@ export function FormDialog({
       </Button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 text-left sm:items-center">
           <div className="animate-fade absolute inset-0 bg-ink/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <div className="animate-pop relative z-10 w-full max-w-lg overflow-hidden rounded-2xl bg-surface shadow-pop ring-1 ring-black/5">
             {/* Header */}
