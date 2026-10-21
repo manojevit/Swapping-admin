@@ -113,8 +113,8 @@ function NewLoginDialog() {
   return (
     <FormDialog icon={<Users className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> New login</>} title="New console login" description="Invite an admin or operator to the console." submitLabel="Create login">
       <Field label="Email" type="email" placeholder="name@evitpl.com" required />
-      <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} />
-      <SelectField label="Organisation" options={["Every organisation", ...ORGS.map((o) => o.name)]} />
+      <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} required />
+      <SelectField label="Organisation" options={["Every organisation", ...ORGS.map((o) => o.name)]} required />
     </FormDialog>
   );
 }
@@ -122,9 +122,9 @@ function NewLoginDialog() {
 function EditLoginDialog({ email, role }: { email: string; role: string }) {
   return (
     <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title="Edit login" description="Update role and access." submitLabel="Save changes">
-      <Field label="Email" type="email" defaultValue={email} />
-      <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} defaultValue={role} />
-      <SelectField label="Status" options={["Active", "Inactive"]} />
+      <Field label="Email" type="email" defaultValue={email} required />
+      <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} defaultValue={role} required />
+      <SelectField label="Status" options={["Active", "Inactive"]} required />
     </FormDialog>
   );
 }

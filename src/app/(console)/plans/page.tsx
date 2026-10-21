@@ -79,10 +79,10 @@ function NewPlanDialog() {
       <Field label="Plan name" placeholder="e.g. Unlimited Monthly" required />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (₹)" type="number" placeholder="2499" required />
-        <SelectField label="Period" options={["30 days", "7 days", "Per swap"]} />
+        <SelectField label="Period" options={["30 days", "7 days", "Per swap"]} required />
       </div>
-      <SelectField label="Organisation" options={["Shared template", "EVI Pilot Fleet", "EVIT ORG"]} />
-      <Field label="What it includes (one per line)" placeholder="Unlimited swaps, every day" />
+      <SelectField label="Organisation" options={["Shared template", "EVI Pilot Fleet", "EVIT ORG"]} required />
+      <Field label="What it includes (one per line)" placeholder="Unlimited swaps, every day" optional />
     </FormDialog>
   );
 }
@@ -90,12 +90,12 @@ function NewPlanDialog() {
 function EditPlanDialog({ name, price, period }: { name: string; price: string; period: string }) {
   return (
     <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} description="Update plan details." submitLabel="Save changes">
-      <Field label="Plan name" defaultValue={name} />
+      <Field label="Plan name" defaultValue={name} required />
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Price (₹)" type="number" defaultValue={price} />
-        <SelectField label="Period" options={["30 days", "7 days", "Per swap"]} defaultValue={period} />
+        <Field label="Price (₹)" type="number" defaultValue={price} required />
+        <SelectField label="Period" options={["30 days", "7 days", "Per swap"]} defaultValue={period} required />
       </div>
-      <SelectField label="Status" options={["Active", "Inactive"]} />
+      <SelectField label="Status" options={["Active", "Inactive"]} required />
     </FormDialog>
   );
 }

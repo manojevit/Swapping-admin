@@ -83,8 +83,8 @@ function NewOrgDialog() {
     <FormDialog icon={<Building2 className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> New organisation</>} title="New organisation" description="Register a fleet organisation on the network." submitLabel="Create organisation">
       <Field label="Organisation name" placeholder="e.g. EVI Pilot Fleet" required />
       <Field label="Code" placeholder="e.g. EVIPILOT" required />
-      <Field label="City" placeholder="e.g. Panchkula" />
-      <Field label="Description" placeholder="Short description of the organisation" />
+      <Field label="City" placeholder="e.g. Panchkula" optional />
+      <Field label="Description" placeholder="Short description of the organisation" optional />
     </FormDialog>
   );
 }
@@ -92,10 +92,10 @@ function NewOrgDialog() {
 function EditOrgDialog({ name, code, city }: { name: string; code: string; city: string }) {
   return (
     <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} description="Update organisation details." submitLabel="Save changes">
-      <Field label="Organisation name" defaultValue={name} />
-      <Field label="Code" defaultValue={code} />
-      <Field label="City" defaultValue={city} />
-      <SelectField label="Status" options={["Active", "Inactive"]} />
+      <Field label="Organisation name" defaultValue={name} required />
+      <Field label="Code" defaultValue={code} required />
+      <Field label="City" defaultValue={city} optional />
+      <SelectField label="Status" options={["Active", "Inactive"]} required />
     </FormDialog>
   );
 }

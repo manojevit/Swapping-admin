@@ -97,29 +97,32 @@ export function FormDialog({
 const control =
   "h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-[14px] text-ink placeholder:text-faint transition-colors hover:border-black/15 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15";
 
-function Label({ children, required }: { children: ReactNode; required?: boolean }) {
+function Label({ children, required, optional }: { children: ReactNode; required?: boolean; optional?: boolean }) {
   return (
-    <span className="mb-1.5 block text-[13px] font-medium text-ink">
-      {children}
-      {required ? <span className="text-brand-600"> *</span> : null}
+    <span className="mb-1.5 flex items-center justify-between gap-2">
+      <span className="text-[13px] font-medium text-ink">
+        {children}
+        {required ? <span className="text-brand-600"> *</span> : null}
+      </span>
+      {optional ? <span className="text-[11px] font-normal text-faint">Optional</span> : null}
     </span>
   );
 }
 
-export function Field({ label, placeholder, type = "text", defaultValue, required, hint }: { label: string; placeholder?: string; type?: string; defaultValue?: string; required?: boolean; hint?: string }) {
+export function Field({ label, placeholder, type = "text", defaultValue, required, optional, hint }: { label: string; placeholder?: string; type?: string; defaultValue?: string; required?: boolean; optional?: boolean; hint?: string }) {
   return (
     <label className="block">
-      <Label required={required}>{label}</Label>
-      <input type={type} placeholder={placeholder} defaultValue={defaultValue} className={control} />
+      <Label required={required} optional={optional}>{label}</Label>
+      <input type={type} placeholder={placeholder} defaultValue={defaultValue} required={required} className={control} />
       {hint ? <span className="mt-1.5 block text-[12px] text-faint">{hint}</span> : null}
     </label>
   );
 }
 
-export function SelectField({ label, options, defaultValue, required }: { label: string; options: string[]; defaultValue?: string; required?: boolean }) {
+export function SelectField({ label, options, defaultValue, required, optional }: { label: string; options: string[]; defaultValue?: string; required?: boolean; optional?: boolean }) {
   return (
     <label className="block">
-      <Label required={required}>{label}</Label>
+      <Label required={required} optional={optional}>{label}</Label>
       <span className="relative block">
         <select defaultValue={defaultValue} className={cn(control, "cursor-pointer appearance-none pr-10")}>
           {options.map((o) => (

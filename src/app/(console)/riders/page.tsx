@@ -35,8 +35,8 @@ export default function RidersPage() {
             <FormDialog icon={<Users className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Add rider</>} title="Add rider" description="Register a new rider on the network." submitLabel="Add rider">
               <Field label="Full name" placeholder="e.g. Rahul Kumar" required />
               <Field label="Phone number" placeholder="+91 ..." required />
-              <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
-              <Field label="City" placeholder="e.g. New Delhi" />
+              <SelectField label="Organisation" options={ORGS.map((o) => o.name)} required />
+              <Field label="City" placeholder="e.g. New Delhi" optional />
               <SelectField label="Swap permission" options={["Allowed", "Blocked"]} />
             </FormDialog>
           ) : undefined
@@ -102,9 +102,9 @@ export default function RidersPage() {
                 <TD><StatusPill tone={r.swapAllowed ? "success" : "danger"}>{r.swapAllowed ? "Allowed" : "Blocked"}</StatusPill></TD>
                 <TD align="right">
                   <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
-                    <Field label="Full name" defaultValue={r.name} />
-                    <Field label="Phone number" defaultValue={r.phone} />
-                    <Field label="City" defaultValue={r.city ?? ""} />
+                    <Field label="Full name" defaultValue={r.name} required />
+                    <Field label="Phone number" defaultValue={r.phone} required />
+                    <Field label="City" defaultValue={r.city ?? ""} optional />
                     <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
                     <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
                   </FormDialog>

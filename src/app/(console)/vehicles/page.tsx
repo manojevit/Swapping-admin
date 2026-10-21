@@ -38,8 +38,8 @@ export default function VehiclesPage() {
               <FormDialog icon={<Bike className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Add vehicle</>} title="Add vehicle" description="Register a vehicle to the fleet." submitLabel="Add vehicle">
                 <Field label="Vehicle code" placeholder="e.g. EVX-010" required />
                 <Field label="Chassis number" placeholder="SESEAG032600..." required />
-                <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} />
-                <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
+                <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} required />
+                <SelectField label="Organisation" options={ORGS.map((o) => o.name)} required />
               </FormDialog>
             </>
           ) : undefined
@@ -109,9 +109,9 @@ export default function VehiclesPage() {
                   <div className="flex items-center justify-end gap-1.5">
                     <Button variant="secondary" size="sm"><Link2 className="h-3.5 w-3.5" /> {v.rider ? "Reassign" : "Assign"}</Button>
                     <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${v.code}`} description={`Update ${v.id} details.`} submitLabel="Save changes">
-                      <Field label="Vehicle code" defaultValue={v.code} />
-                      <Field label="Chassis number" defaultValue={v.chassis} />
-                      <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} defaultValue={v.model} />
+                      <Field label="Vehicle code" defaultValue={v.code} required />
+                      <Field label="Chassis number" defaultValue={v.chassis} required />
+                      <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} defaultValue={v.model} required />
                       <SelectField label="Status" options={["On road", "Off road"]} defaultValue={v.status === "on_road" ? "On road" : "Off road"} />
                     </FormDialog>
                   </div>

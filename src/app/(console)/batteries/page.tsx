@@ -37,9 +37,9 @@ export default function BatteriesPage() {
               <Button variant="secondary" size="lg"><Upload className="h-4 w-4" /> Bulk upload</Button>
               <FormDialog icon={<BatteryFull className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Register battery</>} title="Register battery" description="Add a new battery pack to inventory." submitLabel="Register battery">
                 <Field label="Serial number" placeholder="INCBZG5145M...." required />
-                <Field label="Brand" placeholder="e.g. Superpower" />
-                <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
-                <SelectField label="Assign to station" options={["Unassigned", ...STATIONS.map((s) => s.code)]} />
+                <Field label="Brand" placeholder="e.g. Superpower" optional />
+                <SelectField label="Organisation" options={ORGS.map((o) => o.name)} required />
+                <SelectField label="Assign to station" options={["Unassigned", ...STATIONS.map((s) => s.code)]} optional />
               </FormDialog>
             </>
           ) : undefined
