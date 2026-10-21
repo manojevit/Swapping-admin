@@ -31,7 +31,8 @@ export default function MapPage() {
   const { user } = useSession();
   const all = user.orgId ? STATIONS.filter((s) => s.orgId === user.orgId) : STATIONS;
   const [filter, setFilter] = useState<Filter>("all");
-  const [selected, setSelected] = useState<Station | null>(null);
+  // Pre-select the first station so the detail panel is never empty.
+  const [selected, setSelected] = useState<Station | null>(() => all[0] ?? null);
   const orgName = (id: string) => ORGS.find((o) => o.id === id)?.name ?? "—";
 
   const counts = {
@@ -73,9 +74,9 @@ export default function MapPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px]">
         <Card className="overflow-hidden p-2">
-          <div className="h-[440px] w-full">
+          <div className="h-[460px] w-full">
             <NetworkMap stations={shown} onSelect={setSelected} />
           </div>
         </Card>
@@ -113,12 +114,10 @@ export default function MapPage() {
               </div>
             </div>
           ) : (
-            <div className="grid h-full place-items-center text-center">
-              <div>
-                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600"><MapPin className="h-6 w-6" /></span>
-                <p className="mt-3 text-[14px] font-semibold text-ink">Select a station</p>
-                <p className="mt-1 text-[13px] text-muted">Click a pin on the map to see its live details.</p>
-              </div>
+            <div className="py-10 text-center">
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600"><MapPin className="h-6 w-6" /></span>
+              <p className="mt-3 text-[14px] font-semibold text-ink">Select a station</p>
+              <p className="mt-1 text-[13px] text-muted">Click a pin on the map to see its live details.</p>
             </div>
           )}
         </Card>

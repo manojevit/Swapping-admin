@@ -61,10 +61,12 @@ export default function RevenuePage() {
           <h3 className="text-[15px] font-semibold text-ink">Recent transactions</h3>
           <Button variant="secondary" size="sm" disabled><Download className="h-3.5 w-3.5" /> Export</Button>
         </div>
-        <div className="mt-6 grid place-items-center py-10 text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600"><FileText className="h-6 w-6" /></span>
-          <p className="mt-3 text-[14px] font-semibold text-ink">No transactions yet</p>
-          <p className="mt-1 text-[13px] text-muted">Transactions will appear here once riders start swapping and paying.</p>
+        <div className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-canvas/40 px-4 py-5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600"><FileText className="h-5 w-5" /></span>
+          <div>
+            <p className="text-[14px] font-semibold text-ink">No transactions yet</p>
+            <p className="text-[13px] text-muted">Transactions will appear here once riders start swapping and paying.</p>
+          </div>
         </div>
       </Card>
     </div>
@@ -87,8 +89,8 @@ function Kpi({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: 
 
 function EmptyChart({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
-    <div className="mt-6 grid place-items-center rounded-xl border border-dashed border-line py-16 text-center">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</span>
+    <div className="mt-4 grid place-items-center rounded-xl border border-dashed border-line py-10 text-center">
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</span>
       <p className="mt-3 text-[14px] font-semibold text-ink">{title}</p>
       <p className="mt-1 max-w-xs text-[13px] text-muted">{body}</p>
     </div>

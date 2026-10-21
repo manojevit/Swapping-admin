@@ -108,7 +108,7 @@ export default function OverviewPage() {
           <CardHeader
             icon={<Activity className="h-5 w-5" />}
             title="Recent Activity"
-            action={<button className="text-[13px] font-semibold text-brand-600">View all ›</button>}
+            action={<button className="text-[13px] font-semibold text-brand-600 hover:text-brand-700">View all</button>}
           />
           <div className="px-3 py-3">
             <RecentActivity />
