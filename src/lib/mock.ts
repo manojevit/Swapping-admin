@@ -73,6 +73,72 @@ export const BATTERY_STATUS_BREAKDOWN = [
 
 export const SLOT_OCCUPANCY = { occupied: 854, empty: 106, total: 960 };
 
+// ---- Station detail (bays, commands, info) ----
+const STATION_META: Record<string, { address: string; installedOn: string }> = {
+  "EVX-PKL-0001": { address: "Ground Floor, DSS 323, Sector 20 Market, Near HP Petrol Pump, Sector 20, Panchkula 134117", installedOn: "15 Sep 2026, 10:20 am" },
+};
+
+function buildBays(station: Station): import("./types").Bay[] {
+  const total = station.baysTotal;
+  const charged = station.status === "offline" ? 0 : station.readyPacks;
+  const occupied = station.status === "offline" ? 0 : station.baysFull;
+  const charging = Math.max(0, occupied - charged);
+  const faulted = station.faults;
+
+  const sampleSerials = ["INCBZG5145M0155", "INCBZG5145V0801", "INCBZG5145M0206", "INCBZG5145M0159", "INCBZG5145M0625", "INCBZG5145M0195"];
+  const bays: import("./types").Bay[] = [];
+  for (let i = 1; i <= total; i++) {
+    let state: import("./types").BayState;
+    if (i <= charged) state = "charged";
+    else if (i <= charged + charging) state = "charging";
+    else if (i > total - faulted) state = "faulted";
+    else state = "empty";
+
+    const filled = state === "charged" || state === "charging";
+    bays.push({
+      index: i,
+      state,
+      soc: state === "charged" ? 100 : state === "charging" ? [21, 60, 76][i % 3] : null,
+      serial: filled ? sampleSerials[(i - 1) % sampleSerials.length] : null,
+      voltage: filled ? (state === "charged" ? 53.5 : 54.1) : null,
+      current: filled ? (state === "charging" ? 15.6 : 0.0) : null,
+      temp: filled ? (state === "charging" ? 38 : 40) : null,
+      soh: null,
+      flap: "closed",
+    });
+  }
+  return bays;
+}
+
+const SAMPLE_COMMANDS: import("./types").StationCommand[] = [
+  { at: iso(60 * 3), bay: 1, what: "OPEN_FLAP · operator (admin tool)", delivered: true },
+  { at: iso(60 * 4), bay: 7, what: "OPEN_FLAP · swap", delivered: true },
+  { at: iso(60 * 4 + 1), bay: 5, what: "OPEN_FLAP · swap", delivered: true },
+  { at: iso(60 * 4 + 2), bay: 5, what: "OPEN_FLAP · flap fell back to CLOSED", delivered: true },
+  { at: iso(60 * 4 + 3), bay: 6, what: "OPEN_FLAP · operator (admin tool)", delivered: true },
+];
+
+export function getStationDetail(id: string): import("./types").StationDetail | null {
+  const station = STATIONS.find((s) => s.id === id || s.code === id);
+  if (!station) return null;
+  const meta = STATION_META[station.code] ?? {
+    address: `${station.location} — ${station.name}`,
+    installedOn: "15 Sep 2026, 10:20 am",
+  };
+  const lastSwapRow = SWAPS.find((sw) => sw.stationCode === station.code) ?? null;
+  return {
+    ...station,
+    address: meta.address,
+    locationId: station.code,
+    installedOn: meta.installedOn,
+    bays: buildBays(station),
+    commands: station.status === "offline" ? [] : SAMPLE_COMMANDS,
+    lastSwap: lastSwapRow
+      ? { id: lastSwapRow.id, outcome: "SWAP_COMPLETED", bayIn: lastSwapRow.bayIn, bayOut: lastSwapRow.bayOut, startedAt: lastSwapRow.startedAt }
+      : null,
+  };
+}
+
 // ---- Per-screen KPI headers (echo the approved mockups) ----
 export const STATION_KPIS = { total: 6, online: 2, offline: 3, maintenance: 1, totalSlots: 54, readySlots: 2 };
 export const BATTERY_KPIS = { total: 160, healthy: 144, low: 8, fault: 6 };

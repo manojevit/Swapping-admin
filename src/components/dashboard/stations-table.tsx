@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Download, Search } from "lucide-react";
 import { STATIONS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
@@ -95,7 +96,12 @@ export function StationsTable() {
                   <span className={s.faults > 0 ? "text-danger" : "text-muted"}>{s.faults}</span>
                 </td>
                 <td className="px-5 py-3.5 text-right">
-                  <Button variant="secondary" size="sm">Open</Button>
+                  <Link
+                    href={`/stations/${s.id}`}
+                    className="inline-flex h-8 items-center rounded-xl border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-canvas"
+                  >
+                    Open
+                  </Link>
                 </td>
               </tr>
             ))}

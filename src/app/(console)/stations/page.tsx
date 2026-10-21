@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Plus, Download, RefreshCw, QrCode, KeyRound, Pencil, Radio, CircleDot, CircleOff, Wrench, Database, Package, MapPin } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
@@ -83,7 +84,7 @@ export default function StationsPage() {
             {rows.map((s) => (
               <TR key={s.id}>
                 <TD>
-                  <p className="text-[14px] font-semibold text-ink">{s.name}</p>
+                  <Link href={`/stations/${s.id}`} className="text-[14px] font-semibold text-ink hover:text-brand-600">{s.name}</Link>
                   <p className="nums text-[12px] text-faint">{s.code}</p>
                 </TD>
                 <TD className="font-medium">{orgName(s.orgId)}</TD>

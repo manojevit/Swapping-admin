@@ -33,6 +33,42 @@ export interface Station {
   faults: number;
 }
 
+export type BayState = "charged" | "charging" | "empty" | "faulted";
+
+export interface Bay {
+  index: number; // 1-based
+  state: BayState;
+  soc: number | null;
+  serial: string | null;
+  voltage: number | null;
+  current: number | null;
+  temp: number | null;
+  soh: number | null;
+  flap: "closed" | "open";
+}
+
+export interface StationCommand {
+  at: string;
+  bay: number;
+  what: string; // e.g. "OPEN_FLAP · swap"
+  delivered: boolean;
+}
+
+export interface StationDetail extends Station {
+  address: string;
+  locationId: string;
+  installedOn: string;
+  bays: Bay[];
+  commands: StationCommand[];
+  lastSwap: {
+    id: string;
+    outcome: string;
+    bayIn: number;
+    bayOut: number;
+    startedAt: string;
+  } | null;
+}
+
 export interface Battery {
   id: string; // serial, e.g. INCBZG5145M0164
   brand: string;
