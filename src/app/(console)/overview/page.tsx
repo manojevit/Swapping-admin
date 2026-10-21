@@ -42,7 +42,7 @@ export default function OverviewPage() {
         actions={
           <>
             <button className="flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 text-[13px] font-medium text-muted">
-              <CalendarDays className="h-4 w-4" /> 21 Oct 2026 – 21 Oct 2026
+              <CalendarDays className="h-4 w-4" /> Last 24 hours
             </button>
             <StatusPill tone="success" className="h-10 px-3.5">Live</StatusPill>
             <Button variant="secondary" size="lg">

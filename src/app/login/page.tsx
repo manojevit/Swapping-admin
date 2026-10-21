@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Zap, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 // Frontend-only sign-in. There is no real auth here — submitting routes into
 // the console. A real backend would verify credentials and start a session.
@@ -21,12 +22,9 @@ export default function LoginPage() {
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Brand panel */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-10 text-white lg:flex">
-        <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center rounded-xl bg-white text-[12px] font-black text-sidebar">EVX</span>
-          <div className="leading-tight">
-            <p className="text-[17px] font-bold">EVCHARGEX</p>
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-sidebar-muted">CONSOLE</p>
-          </div>
+        <div>
+          <Logo tone="light" width={190} />
+          <p className="mt-2 text-[10px] font-semibold tracking-[0.22em] text-sidebar-muted">CONSOLE</p>
         </div>
         <div className="relative z-10">
           <h1 className="max-w-md text-[34px] font-bold leading-tight">Run your battery-swapping network from one console.</h1>
@@ -43,9 +41,8 @@ export default function LoginPage() {
       {/* Form */}
       <div className="flex items-center justify-center bg-canvas px-6 py-12">
         <div className="w-full max-w-sm">
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-sidebar text-[11px] font-black text-white">EVX</span>
-            <p className="text-[16px] font-bold text-ink">EVCHARGEX Console</p>
+          <div className="mb-8 lg:hidden">
+            <Logo tone="dark" width={170} />
           </div>
 
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600"><Zap className="h-6 w-6" /></span>

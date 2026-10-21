@@ -169,9 +169,12 @@ function AnalyticKpi({ icon, label, value, delta, up }: { icon: React.ReactNode;
         <span className="text-[12px] font-semibold uppercase tracking-wide text-faint">{label}</span>
       </div>
       <p className="nums mt-3 text-[26px] font-bold leading-none text-ink">{value}</p>
-      <p className={cn("mt-2 flex items-center gap-1 text-[12px] font-medium", up ? "text-success-ink" : "text-danger-ink")}>
-        {up ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-        {up ? "↑" : "↓"} {Math.abs(delta)}% <span className="text-faint">vs previous {30}</span>
+      <p className="mt-2 flex items-center gap-1.5 text-[12px]">
+        <span className={cn("inline-flex items-center gap-1 font-semibold", up ? "text-success-ink" : "text-danger-ink")}>
+          {up ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+          {Math.abs(delta)}%
+        </span>
+        <span className="text-faint">vs previous period</span>
       </p>
     </Card>
   );
