@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { RefreshCw, Radio, CircleDot, CircleOff, Wrench, MapPin, X, ExternalLink, Navigation } from "lucide-react";
+import { RefreshCw, Radio, CircleDot, CircleOff, Wrench, MapPin, X, ExternalLink, Navigation, Search, Download } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card } from "@/components/ui/card";
@@ -11,9 +11,10 @@ import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { BayBar } from "@/components/ui/bay-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
+import { useToast } from "@/components/ui/toast";
 import { STATIONS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
-import { cn, timeAgo } from "@/lib/utils";
+import { cn, exportCsv, timeAgo } from "@/lib/utils";
 import type { Station, StationStatus } from "@/lib/types";
 
 const NetworkMap = dynamic(() => import("@/components/dashboard/network-map"), {
@@ -28,20 +29,50 @@ const TONE: Record<StationStatus, "success" | "danger" | "warn" | "neutral"> = {
 type Filter = "all" | "online" | "offline" | "maintenance";
 
 export default function MapPage() {
-  const { user } = useSession();
+  const { user, can } = useSession();
+  const { show } = useToast();
   const all = user.orgId ? STATIONS.filter((s) => s.orgId === user.orgId) : STATIONS;
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
+  const [orgFilter, setOrgFilter] = useState("all");
+  const [refreshing, setRefreshing] = useState(false);
   // Pre-select the first station so the detail panel is never empty.
   const [selected, setSelected] = useState<Station | null>(() => all[0] ?? null);
   const orgName = (id: string) => ORGS.find((o) => o.id === id)?.name ?? "—";
 
+  // Org + search narrows the set; the status tabs filter on top of that.
+  const preStatus = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return all.filter((s) => {
+      if (q && !`${s.name} ${s.code} ${s.location}`.toLowerCase().includes(q)) return false;
+      if (orgFilter !== "all" && orgName(s.orgId) !== orgFilter) return false;
+      return true;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, query, orgFilter]);
+
   const counts = {
-    all: all.length,
-    online: all.filter((s) => s.status === "online").length,
-    offline: all.filter((s) => s.status === "offline").length,
-    maintenance: all.filter((s) => s.status === "maintenance").length,
+    all: preStatus.length,
+    online: preStatus.filter((s) => s.status === "online").length,
+    offline: preStatus.filter((s) => s.status === "offline").length,
+    maintenance: preStatus.filter((s) => s.status === "maintenance").length,
   };
-  const shown = useMemo(() => (filter === "all" ? all : all.filter((s) => s.status === filter)), [all, filter]);
+  const shown = useMemo(() => (filter === "all" ? preStatus : preStatus.filter((s) => s.status === filter)), [preStatus, filter]);
+
+  function refresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    setTimeout(() => { setRefreshing(false); show("Map refreshed", { description: "Station positions and status are current." }); }, 700);
+  }
+
+  function handleExport() {
+    exportCsv(
+      "stations-map.csv",
+      ["Station", "Code", "Organisation", "Location", "Latitude", "Longitude", "Status", "Bays full", "Bays total", "Faults"],
+      shown.map((s) => [s.name, s.code, orgName(s.orgId), s.location, s.lat, s.lng, s.status, s.baysFull, s.baysTotal, s.faults]),
+    );
+    show("Stations exported", { description: `${shown.length} ${shown.length === 1 ? "row" : "rows"} · stations-map.csv` });
+  }
 
   return (
     <div>
@@ -49,7 +80,11 @@ export default function MapPage() {
         breadcrumb="Network"
         title="Network map"
         subtitle="Live status of all battery-swapping stations"
-        actions={<Button variant="secondary" size="lg"><RefreshCw className="h-4 w-4" /> Refresh</Button>}
+        actions={
+          <Button variant="secondary" size="lg" onClick={refresh} disabled={refreshing}>
+            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} /> {refreshing ? "Refreshing…" : "Refresh"}
+          </Button>
+        }
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -59,19 +94,40 @@ export default function MapPage() {
         <KpiCard icon={<Wrench className="h-5 w-5" />} label="Maintenance" value={counts.maintenance} sub="Under maintenance" tone="warn" />
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-2">
-        {([["all", "All"], ["online", "Online"], ["offline", "Offline"], ["maintenance", "Maintenance"]] as [Filter, string][]).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={cn(
-              "flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] font-semibold transition-colors",
-              filter === key ? "border-brand-600 bg-brand-600 text-white" : "border-line bg-surface text-muted hover:text-ink",
-            )}
-          >
-            {label} <span className={cn("nums", filter === key ? "text-white/80" : "text-faint")}>{counts[key]}</span>
-          </button>
-        ))}
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap gap-2">
+          {([["all", "All"], ["online", "Online"], ["offline", "Offline"], ["maintenance", "Maintenance"]] as [Filter, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={cn(
+                "flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] font-semibold transition-colors",
+                filter === key ? "border-brand-600 bg-brand-600 text-white" : "border-line bg-surface text-muted hover:text-ink",
+              )}
+            >
+              {label} <span className={cn("nums", filter === key ? "text-white/80" : "text-faint")}>{counts[key]}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div className="relative min-w-[200px]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search stations…"
+              className="h-9 w-full rounded-xl border border-line bg-surface pl-9 pr-3 text-[13px] placeholder:text-faint focus:border-brand-300 focus:outline-none"
+            />
+          </div>
+          {can("view_all_orgs") ? (
+            <select value={orgFilter} onChange={(e) => setOrgFilter(e.target.value)} className="h-9 rounded-xl border border-line bg-surface px-3 text-[13px] text-ink">
+              <option value="all">All organisations</option>
+              {ORGS.map((o) => (<option key={o.id} value={o.name}>{o.name}</option>))}
+            </select>
+          ) : null}
+          <Button variant="secondary" size="sm" onClick={handleExport}><Download className="h-4 w-4" /> Export</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px]">
@@ -126,8 +182,8 @@ export default function MapPage() {
       <Card className="mt-4">
         <div className="flex items-center gap-2 px-5 pt-5">
           <Radio className="h-4 w-4 text-brand-600" />
-          <h3 className="text-[15px] font-semibold text-ink">Stations near view</h3>
-          <span className="text-[13px] text-muted">· Showing all {shown.length} stations</span>
+          <h3 className="text-[15px] font-semibold text-ink">Stations in view</h3>
+          <span className="text-[13px] text-muted">· {shown.length} {shown.length === 1 ? "station" : "stations"}</span>
         </div>
         <div className="mt-4">
           <Table>
@@ -135,7 +191,9 @@ export default function MapPage() {
               <TH>Station</TH><TH>Organisation</TH><TH>Location</TH><TH>Status</TH><TH>Bays</TH><TH>Last seen</TH><TH align="right">Faults</TH><TH align="right">Action</TH>
             </THead>
             <TBody>
-              {shown.map((s) => (
+              {shown.length === 0 ? (
+                <TR><TD className="py-10 text-center text-muted">No stations match your filters.</TD><TD /><TD /><TD /><TD /><TD /><TD /><TD /></TR>
+              ) : shown.map((s) => (
                 <TR key={s.id}>
                   <TD>
                     <button onClick={() => setSelected(s)} className="text-[14px] font-semibold text-ink hover:text-brand-600">{s.name}</button>
