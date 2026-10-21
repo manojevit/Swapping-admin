@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import {
   Activity,
   BatteryCharging,
@@ -13,8 +15,12 @@ import {
   Users,
   Gauge,
   HeartPulse,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
+import { useToast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Donut } from "@/components/dashboard/donut";
@@ -31,8 +37,27 @@ import {
 } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 
+const RANGES = [
+  { key: "24h", label: "Last 24 hours" },
+  { key: "7d", label: "Last 7 days" },
+  { key: "30d", label: "Last 30 days" },
+] as const;
+
 export default function OverviewPage() {
   const { user } = useSession();
+  const { show } = useToast();
+  const [range, setRange] = useState<(typeof RANGES)[number]>(RANGES[0]);
+  const [rangeOpen, setRangeOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  function refresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      show("Overview refreshed", { description: "Showing the latest network data." });
+    }, 700);
+  }
 
   return (
     <div>
@@ -41,12 +66,35 @@ export default function OverviewPage() {
         subtitle="Live view of your EV battery swapping network"
         actions={
           <>
-            <button className="flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 text-[13px] font-medium text-muted">
-              <CalendarDays className="h-4 w-4" /> Last 24 hours
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setRangeOpen((o) => !o)}
+                className="flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 text-[13px] font-medium text-muted hover:border-black/15"
+              >
+                <CalendarDays className="h-4 w-4" /> {range.label}
+                <ChevronDown className="h-4 w-4 text-faint" />
+              </button>
+              {rangeOpen ? (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setRangeOpen(false)} />
+                  <div className="absolute right-0 z-20 mt-1.5 w-44 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-pop">
+                    {RANGES.map((r) => (
+                      <button
+                        key={r.key}
+                        onClick={() => { setRange(r); setRangeOpen(false); show("Date range updated", { description: r.label, tone: "info" }); }}
+                        className={cn("flex w-full items-center justify-between px-3.5 py-2 text-left text-[13px] hover:bg-canvas", r.key === range.key ? "font-semibold text-ink" : "text-muted")}
+                      >
+                        {r.label}
+                        {r.key === range.key ? <Check className="h-4 w-4 text-brand-600" /> : null}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </div>
             <StatusPill tone="success" className="h-10 px-3.5">Live</StatusPill>
-            <Button variant="secondary" size="lg">
-              <RefreshCw className="h-4 w-4" /> Refresh
+            <Button variant="secondary" size="lg" onClick={refresh} disabled={refreshing}>
+              <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} /> {refreshing ? "Refreshing…" : "Refresh"}
             </Button>
           </>
         }
@@ -108,7 +156,7 @@ export default function OverviewPage() {
           <CardHeader
             icon={<Activity className="h-5 w-5" />}
             title="Recent Activity"
-            action={<button className="text-[13px] font-semibold text-brand-600 hover:text-brand-700">View all</button>}
+            action={<Link href="/swaps" className="text-[13px] font-semibold text-brand-600 hover:text-brand-700">View all</Link>}
           />
           <div className="px-3 py-3">
             <RecentActivity />
