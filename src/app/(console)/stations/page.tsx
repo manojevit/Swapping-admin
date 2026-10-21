@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Download, RefreshCw, QrCode, KeyRound, Pencil, Radio, CircleDot, CircleOff, Wrench, Database, Package, MapPin } from "lucide-react";
+import { Plus, Download, RefreshCw, QrCode, Pencil, Radio, CircleDot, CircleOff, Wrench, Database, Package, MapPin } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card } from "@/components/ui/card";
@@ -12,12 +12,12 @@ import { BayBar } from "@/components/ui/bay-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
-import { QrModal, KeyModal } from "@/components/dashboard/station-modals";
+import { QrModal } from "@/components/dashboard/station-modals";
 import { useToast } from "@/components/ui/toast";
 import { STATIONS, ORGS, getStationDetail } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { exportCsv, timeAgo } from "@/lib/utils";
-import type { Station, StationDetail, StationStatus } from "@/lib/types";
+import type { StationDetail, StationStatus } from "@/lib/types";
 
 const TONE: Record<StationStatus, "success" | "danger" | "warn" | "neutral"> = {
   online: "success", offline: "danger", maintenance: "warn", unknown: "neutral",
@@ -38,7 +38,6 @@ export default function StationsPage() {
   const [statusFilter, setStatusFilter] = useState("All status");
   const [refreshing, setRefreshing] = useState(false);
   const [qrStation, setQrStation] = useState<StationDetail | null>(null);
-  const [keyStation, setKeyStation] = useState<Station | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -155,7 +154,6 @@ export default function StationsPage() {
                 <TD align="right">
                   <div className="flex items-center justify-end gap-1.5">
                     <Button variant="secondary" size="sm" onClick={() => setQrStation(getStationDetail(s.id))}><QrCode className="h-3.5 w-3.5" /> QR</Button>
-                    {can("manage_stations") ? <Button variant="secondary" size="sm" onClick={() => setKeyStation(s)}><KeyRound className="h-3.5 w-3.5" /> Key</Button> : null}
                     {can("manage_stations") ? (
                       <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${s.code}`} description="Update station details." submitLabel="Save changes">
                         <Field label="Display name" defaultValue={s.name} required />
@@ -173,7 +171,6 @@ export default function StationsPage() {
       </Card>
 
       {qrStation ? <QrModal open onClose={() => setQrStation(null)} station={qrStation} /> : null}
-      {keyStation ? <KeyModal open onClose={() => setKeyStation(null)} stationCode={keyStation.code} /> : null}
     </div>
   );
 }
