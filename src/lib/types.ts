@@ -31,6 +31,30 @@ export interface Station {
   status: StationStatus;
   lastSeen: string; // ISO
   faults: number;
+  lat: number;
+  lng: number;
+}
+
+export interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  period: string; // "30 days" | "Per swap"
+  orgLabel: string; // "Shared template" | org name
+  shared: boolean;
+  includes: string[];
+  subscribers: number;
+  status: "active" | "inactive";
+  createdAt: string;
+}
+
+export interface ConsoleLogin {
+  id: string;
+  email: string;
+  role: "Administrator" | "Fleet operator" | "Viewer";
+  orgLabel: string;
+  lastSignIn: string;
+  status: "active" | "inactive";
 }
 
 export type BayState = "charged" | "charging" | "empty" | "faulted";

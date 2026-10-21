@@ -22,12 +22,12 @@ function iso(minsAgo: number): string {
 }
 
 export const STATIONS: Station[] = [
-  { id: "s1", code: "EVIT-HYT-001", name: "EVIT-HYT-001", orgId: "evit", location: "New Delhi, Delhi", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(2), faults: 0 },
-  { id: "s2", code: "EVIT-HYT-002", name: "EVIT-HYT-002", orgId: "evit", location: "New Delhi, Delhi", baysFull: 0, baysTotal: 9, readyPacks: 0, status: "offline", lastSeen: iso(60 * 24 * 28), faults: 3 },
-  { id: "s3", code: "EVX-PKL-0001", name: "EVX-PANCHKULA", orgId: "evipilot", location: "Panchkula, Haryana", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(3), faults: 0 },
-  { id: "s4", code: "EVX-ZRK-0002", name: "EVX-PEER MUCHALLA", orgId: "evipilot", location: "Zirakpur, Punjab", baysFull: 2, baysTotal: 9, readyPacks: 7, status: "maintenance", lastSeen: iso(10), faults: 1 },
-  { id: "s5", code: "EVIT-HYT-003", name: "EVIT-HYT-003", orgId: "evit", location: "New Delhi, Delhi", baysFull: 0, baysTotal: 9, readyPacks: 0, status: "offline", lastSeen: iso(60), faults: 2 },
-  { id: "s6", code: "EVIT-HYT-004", name: "EVIT-HYT-004", orgId: "evit", location: "New Delhi, Delhi", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(180), faults: 0 },
+  { id: "s1", code: "EVIT-HYT-001", name: "EVIT-HYT-001", orgId: "evit", location: "New Delhi, Delhi", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(2), faults: 0, lat: 28.6139, lng: 77.209 },
+  { id: "s2", code: "EVIT-HYT-002", name: "EVIT-HYT-002", orgId: "evit", location: "New Delhi, Delhi", baysFull: 0, baysTotal: 9, readyPacks: 0, status: "offline", lastSeen: iso(60 * 24 * 28), faults: 3, lat: 28.5355, lng: 77.241 },
+  { id: "s3", code: "EVX-PKL-0001", name: "EVX-PANCHKULA", orgId: "evipilot", location: "Panchkula, Haryana", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(3), faults: 0, lat: 30.6942, lng: 76.8606 },
+  { id: "s4", code: "EVX-ZRK-0002", name: "EVX-PEER MUCHALLA", orgId: "evipilot", location: "Zirakpur, Punjab", baysFull: 2, baysTotal: 9, readyPacks: 7, status: "maintenance", lastSeen: iso(10), faults: 1, lat: 30.6425, lng: 76.8173 },
+  { id: "s5", code: "EVIT-HYT-003", name: "EVIT-HYT-003", orgId: "evit", location: "Noida, Uttar Pradesh", baysFull: 0, baysTotal: 9, readyPacks: 0, status: "offline", lastSeen: iso(60), faults: 2, lat: 28.5355, lng: 77.391 },
+  { id: "s6", code: "EVIT-HYT-004", name: "EVIT-HYT-004", orgId: "evit", location: "Gurugram, Haryana", baysFull: 6, baysTotal: 9, readyPacks: 2, status: "online", lastSeen: iso(180), faults: 0, lat: 28.4595, lng: 77.0266 },
 ];
 
 export const RECENT_ACTIVITY: ActivityItem[] = [
@@ -201,3 +201,64 @@ export const ALERTS: Alert[] = [
   { id: "al4", severity: "warning", title: "No network heartbeat", detail: "Station heartbeat not received", sourceLabel: "EVIT-HYT-004", orgId: "evipilot", raisedAt: iso(60 * 28), status: "resolved" },
   { id: "al5", severity: "info", title: "Maintenance required", detail: "Scheduled maintenance due soon", sourceLabel: "EVX-ZRK-0002", orgId: "evipilot", raisedAt: iso(60 * 52), status: "resolved" },
 ];
+
+// ---- Analytics ----
+export const ANALYTICS_KPIS = {
+  totalSwaps: { value: "1,284", delta: 8.4, up: true },
+  avgDwell: { value: "4m 32s", delta: -12, up: false },
+  batteryTurn: { value: "3.8×", delta: 16, up: true },
+  retention: { value: "76%", delta: 6, up: true },
+};
+export const ANALYTICS_SUBSTATS = {
+  grossRevenue: "₹3,21,000",
+  uptime: "98.6%",
+  avgPerDay: 43,
+  stationsReporting: "18/21",
+};
+export const SWAPS_PER_DAY = Array.from({ length: 30 }, (_, i) => {
+  const base = 30 + 28 * Math.sin(i / 3) + (i > 18 ? 20 : 0);
+  return {
+    day: new Date(2026, 5, 22 + i).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }),
+    completed: Math.max(12, Math.round(base + (i % 4) * 3)),
+    returned: Math.round(4 + 6 * Math.abs(Math.sin(i / 2))),
+    failed: Math.round(2 + 3 * Math.abs(Math.cos(i / 2))),
+  };
+});
+export const STATION_PERFORMANCE = [
+  { name: "Connaught Place", location: "New Delhi", swaps: 342, dwell: "3m 12s", completion: 98, status: "online" as const },
+  { name: "Saket", location: "New Delhi", swaps: 280, dwell: "4m 18s", completion: 96, status: "online" as const },
+  { name: "Rajouri Garden", location: "New Delhi", swaps: 226, dwell: "4m 52s", completion: 94, status: "online" as const },
+  { name: "Dwarka Sector 21", location: "New Delhi", swaps: 180, dwell: "5m 21s", completion: 92, status: "maintenance" as const },
+  { name: "Noida Sector 62", location: "Noida", swaps: 156, dwell: "6m 08s", completion: 90, status: "online" as const },
+];
+export const BATTERY_HEALTH_TREND = Array.from({ length: 28 }, (_, i) => ({
+  day: new Date(2026, 5, 22 + i).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }),
+  healthy: 90 + Math.round(i * 2.2),
+  low: 18 + (i % 5) * 2,
+  fault: 6 + (i % 3) * 2,
+}));
+export const ANALYTICS_INSIGHTS = [
+  { kind: "up" as const, title: "Peak activity hours", body: "Swaps are 42% higher during 5–7 PM compared to daily average. Consider adding staff and battery inventory during this period." },
+  { kind: "warn" as const, title: "Higher failed swaps at Noida Sector 62", body: "Failed swap rate is 3.2% (2× higher than network average). Check battery health and station hardware." },
+];
+
+// ---- Plans ----
+export const PLANS: import("./types").Plan[] = [
+  { id: "p1", name: "Unlimited Monthly", price: 2499, period: "30 days", orgLabel: "Shared template", shared: true, includes: ["Unlimited swaps, every day", "Any EVCHARGEX station", "No per-swap charge", "Priority support"], subscribers: 24, status: "active", createdAt: "01 Oct 2026, 10:30 am" },
+  { id: "p2", name: "Standard Monthly", price: 999, period: "30 days", orgLabel: "EVI Pilot Fleet", shared: false, includes: ["50 swaps per month", "Any EVCHARGEX station", "Standard support"], subscribers: 5, status: "active", createdAt: "15 Sep 2026, 02:14 pm" },
+  { id: "p3", name: "Pay As You Go", price: 49, period: "Per swap", orgLabel: "Shared template", shared: true, includes: ["Pay per swap", "Any EVCHARGEX station", "No subscription required"], subscribers: 2, status: "active", createdAt: "10 Sep 2026, 11:21 am" },
+];
+export const PLAN_KPIS = { total: 3, active: 3, subscribers: 31, mrr: "₹78,549" };
+
+// ---- Console logins ----
+export const CONSOLE_LOGINS: import("./types").ConsoleLogin[] = [
+  { id: "l1", email: "mohzzam@evitpl.com", role: "Administrator", orgLabel: "Every organisation", lastSignIn: "09 Oct 2026, 10:37 am", status: "active" },
+  { id: "l2", email: "akm@evitpl.com", role: "Fleet operator", orgLabel: "EVI Pilot Fleet", lastSignIn: "03 Oct 2026, 10:56 am", status: "active" },
+  { id: "l3", email: "ops@evitpl.com", role: "Fleet operator", orgLabel: "EVI Pilot Fleet", lastSignIn: "05 Oct 2026, 11:33 am", status: "active" },
+];
+
+// ---- Organisation stats (for the Organisations table) ----
+export const ORG_STATS: Record<string, { description: string; stations: number; riders: number; vehicles: number; batteries: number; createdAt: string }> = {
+  evipilot: { description: "Pilot fleet for EVI operations", stations: 2, riders: 31, vehicles: 17, batteries: 18, createdAt: "06 Aug 2026, 10:30 am" },
+  evit: { description: "EVIT organisation network", stations: 4, riders: 1, vehicles: 0, batteries: 0, createdAt: "08 Aug 2026, 11:45 am" },
+};

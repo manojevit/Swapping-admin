@@ -10,6 +10,7 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { BayBar } from "@/components/ui/bay-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
+import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
 import { STATIONS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { timeAgo } from "@/lib/utils";
@@ -41,7 +42,17 @@ export default function StationsPage() {
       <PageHeader
         title="Stations"
         subtitle="Manage and monitor battery swapping stations"
-        actions={can("manage_stations") ? <Button variant="primary" size="lg"><Plus className="h-4 w-4" /> Add station</Button> : undefined}
+        actions={
+          can("manage_stations") ? (
+            <FormDialog trigger={<><Plus className="h-4 w-4" /> Add station</>} title="Add station" description="Register a new swapping station." submitLabel="Add station">
+              <Field label="Station code" placeholder="e.g. EVX-PKL-0002" required />
+              <Field label="Display name" placeholder="e.g. EVX-SECTOR 20" />
+              <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
+              <Field label="Location" placeholder="City, State" />
+              <Field label="Total bays" type="number" placeholder="9" />
+            </FormDialog>
+          ) : undefined
+        }
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -103,7 +114,11 @@ export default function StationsPage() {
                   <div className="flex items-center justify-end gap-1.5">
                     <Button variant="secondary" size="sm"><QrCode className="h-3.5 w-3.5" /> QR</Button>
                     <Button variant="secondary" size="sm"><KeyRound className="h-3.5 w-3.5" /> Key</Button>
-                    <Button variant="secondary" size="sm"><Pencil className="h-3.5 w-3.5" /> Edit</Button>
+                    <FormDialog trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${s.code}`} submitLabel="Save changes">
+                      <Field label="Display name" defaultValue={s.name} />
+                      <Field label="Location" defaultValue={s.location} />
+                      <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={LABEL[s.status]} />
+                    </FormDialog>
                   </div>
                 </TD>
               </TR>

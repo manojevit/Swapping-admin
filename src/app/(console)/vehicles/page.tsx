@@ -9,6 +9,7 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { PercentBar } from "@/components/ui/percent-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
+import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
 import { VEHICLES, VEHICLE_KPIS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 
@@ -34,7 +35,12 @@ export default function VehiclesPage() {
           can("manage_vehicles") ? (
             <>
               <Button variant="secondary" size="lg"><Upload className="h-4 w-4" /> Bulk upload</Button>
-              <Button variant="primary" size="lg"><Plus className="h-4 w-4" /> Add vehicle</Button>
+              <FormDialog trigger={<><Plus className="h-4 w-4" /> Add vehicle</>} title="Add vehicle" description="Register a vehicle to the fleet." submitLabel="Add vehicle">
+                <Field label="Vehicle code" placeholder="e.g. EVX-010" required />
+                <Field label="Chassis number" placeholder="SESEAG032600..." required />
+                <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} />
+                <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
+              </FormDialog>
             </>
           ) : undefined
         }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
+import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
 import { RIDERS, RIDER_KPIS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 
@@ -29,7 +30,17 @@ export default function RidersPage() {
       <PageHeader
         title="Riders"
         subtitle="Manage and monitor registered riders"
-        actions={can("manage_riders") ? <Button variant="primary" size="lg"><Plus className="h-4 w-4" /> Add rider</Button> : undefined}
+        actions={
+          can("manage_riders") ? (
+            <FormDialog trigger={<><Plus className="h-4 w-4" /> Add rider</>} title="Add rider" description="Register a new rider on the network." submitLabel="Add rider">
+              <Field label="Full name" placeholder="e.g. Rahul Kumar" required />
+              <Field label="Phone number" placeholder="+91 ..." required />
+              <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
+              <Field label="City" placeholder="e.g. New Delhi" />
+              <SelectField label="Swap permission" options={["Allowed", "Blocked"]} />
+            </FormDialog>
+          ) : undefined
+        }
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -89,7 +100,15 @@ export default function RidersPage() {
                 <TD><StatusPill tone={r.status === "active" ? "success" : "danger"}>{r.status === "active" ? "Active" : "Suspended"}</StatusPill></TD>
                 <TD align="right" className="nums font-semibold text-ink">{r.swaps}</TD>
                 <TD><StatusPill tone={r.swapAllowed ? "success" : "danger"}>{r.swapAllowed ? "Allowed" : "Blocked"}</StatusPill></TD>
-                <TD align="right"><Button variant="secondary" size="sm"><Pencil className="h-3.5 w-3.5" /> Edit</Button></TD>
+                <TD align="right">
+                  <FormDialog trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} submitLabel="Save changes">
+                    <Field label="Full name" defaultValue={r.name} />
+                    <Field label="Phone number" defaultValue={r.phone} />
+                    <Field label="City" defaultValue={r.city ?? ""} />
+                    <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
+                    <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
+                  </FormDialog>
+                </TD>
               </TR>
             ))}
           </TBody>
