@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
-type Tone = "brand" | "success" | "warn" | "danger" | "info" | "violet";
+type Tone = "brand" | "success" | "warn" | "danger" | "info" | "violet" | "neutral";
 
 const ICON_TONES: Record<Tone, string> = {
   brand: "bg-brand-50 text-brand-600",
@@ -10,6 +10,7 @@ const ICON_TONES: Record<Tone, string> = {
   danger: "bg-danger-soft text-danger-ink",
   info: "bg-info-soft text-info-ink",
   violet: "bg-violet-100 text-violet-600",
+  neutral: "bg-black/5 text-muted",
 };
 
 export function KpiCard({
