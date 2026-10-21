@@ -9,7 +9,7 @@ const STYLE: Record<BayState, { wrap: string; bar: string; dot: string; text: st
   faulted: { wrap: "border-danger/25 bg-danger-soft/30", bar: "bg-danger", dot: "bg-danger", text: "text-danger-ink", label: "Faulted" },
 };
 
-export function BayCard({ bay }: { bay: Bay }) {
+export function BayCard({ bay, onBms }: { bay: Bay; onBms?: (bay: Bay) => void }) {
   const s = STYLE[bay.state];
   const filled = bay.state === "charged" || bay.state === "charging";
   return (
@@ -41,7 +41,11 @@ export function BayCard({ bay }: { bay: Bay }) {
         <span className="rounded-md bg-black/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
           {bay.flap}
         </span>
-        <button className="inline-flex items-center gap-1 rounded-lg border border-line bg-surface px-2 py-1 text-[11px] font-semibold text-muted transition-colors hover:text-ink">
+        <button
+          type="button"
+          onClick={() => onBms?.(bay)}
+          className="inline-flex items-center gap-1 rounded-lg border border-line bg-surface px-2 py-1 text-[11px] font-semibold text-muted transition-colors hover:border-brand-200 hover:text-brand-700"
+        >
           <Cpu className="h-3.5 w-3.5" /> BMS
         </button>
       </div>

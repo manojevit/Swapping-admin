@@ -15,11 +15,16 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { BayCard } from "@/components/dashboard/bay-card";
 import { StationControls } from "@/components/dashboard/station-controls";
+import { QrModal, BmsModal } from "@/components/dashboard/station-modals";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
+import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { useToast } from "@/components/ui/toast";
 import { getStationDetail, ORGS, SWAPS, ALERTS, SWAP_ACTIVITY } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { cn, timeAgo } from "@/lib/utils";
-import type { StationStatus, SwapOutcome, AlertSeverity } from "@/lib/types";
+import type { StationStatus, SwapOutcome, AlertSeverity, Bay } from "@/lib/types";
+
+type AlertState = "open" | "acknowledged" | "resolved";
 
 const NetworkMap = dynamic(() => import("@/components/dashboard/network-map"), {
   ssr: false,
@@ -39,8 +44,12 @@ const SEV: Record<AlertSeverity, "danger" | "warn" | "info"> = { critical: "dang
 
 export default function StationDetailPage({ params }: { params: { id: string } }) {
   const { can } = useSession();
+  const { show } = useToast();
   const station = getStationDetail(params.id);
   const [tab, setTab] = useState<"overview" | "controls">("overview");
+  const [qrOpen, setQrOpen] = useState(false);
+  const [bmsBay, setBmsBay] = useState<Bay | null>(null);
+  const [alertStates, setAlertStates] = useState<Record<string, AlertState>>({});
 
   if (!station) notFound();
 
@@ -97,9 +106,22 @@ export default function StationDetailPage({ params }: { params: { id: string } }
           <p className="mt-1 max-w-3xl text-[14px] text-muted">{station.name} · {station.address}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary"><QrCode className="h-4 w-4" /> QR</Button>
-          <Button variant="secondary"><FileDown className="h-4 w-4" /> SVG</Button>
-          {can("manage_stations") ? <Button variant="primary"><Pencil className="h-4 w-4" /> Edit station</Button> : null}
+          <Button variant="secondary" onClick={() => setQrOpen(true)}><QrCode className="h-4 w-4" /> QR</Button>
+          <Button variant="secondary" onClick={() => setQrOpen(true)}><FileDown className="h-4 w-4" /> SVG</Button>
+          {can("manage_stations") ? (
+            <FormDialog
+              icon={<Pencil className="h-5 w-5" />}
+              trigger={<><Pencil className="h-4 w-4" /> Edit station</>}
+              title={`Edit ${station.code}`}
+              description="Update station details."
+              submitLabel="Save changes"
+            >
+              <Field label="Display name" defaultValue={station.name} required />
+              <Field label="Location" defaultValue={station.location} required />
+              <Field label="Address" defaultValue={station.address} />
+              <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={station.status[0].toUpperCase() + station.status.slice(1)} required />
+            </FormDialog>
+          ) : null}
         </div>
       </div>
 
@@ -133,7 +155,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {bays.map((b) => (<BayCard key={b.index} bay={b} />))}
+                {bays.map((b) => (<BayCard key={b.index} bay={b} onBms={setBmsBay} />))}
               </div>
               <p className="mt-4 border-t border-line pt-3 text-[12px] leading-relaxed text-faint">
                 There is no CLOSE command in this system — the lock is fail-secure and the rider pushes the flap shut by hand. A bay that will not close is a physical problem, not a missing button.
@@ -215,21 +237,34 @@ export default function StationDetailPage({ params }: { params: { id: string } }
                 </div>
               ) : (
                 <ul className="mt-3 space-y-2.5">
-                  {stationAlerts.map((a) => (
-                    <li key={a.id} className="rounded-xl border border-line p-3">
-                      <div className="flex items-center justify-between">
-                        <p className="text-[13px] font-semibold text-ink">{a.title}</p>
-                        <StatusPill tone={SEV[a.severity]}>{a.severity[0].toUpperCase() + a.severity.slice(1)}</StatusPill>
-                      </div>
-                      <p className="mt-0.5 text-[12px] text-muted">{a.detail}</p>
-                      {can("manage_alerts") ? (
-                        <div className="mt-2 flex gap-1.5">
-                          <Button variant="secondary" size="sm"><Check className="h-3.5 w-3.5" /> Ack</Button>
-                          <Button variant="primary" size="sm">Resolve</Button>
+                  {stationAlerts.map((a) => {
+                    const state = alertStates[a.id] ?? "open";
+                    return (
+                      <li key={a.id} className="rounded-xl border border-line p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[13px] font-semibold text-ink">{a.title}</p>
+                          {state === "resolved" ? (
+                            <StatusPill tone="success">Resolved</StatusPill>
+                          ) : state === "acknowledged" ? (
+                            <StatusPill tone="info">Acknowledged</StatusPill>
+                          ) : (
+                            <StatusPill tone={SEV[a.severity]}>{a.severity[0].toUpperCase() + a.severity.slice(1)}</StatusPill>
+                          )}
                         </div>
-                      ) : null}
-                    </li>
-                  ))}
+                        <p className="mt-0.5 text-[12px] text-muted">{a.detail}</p>
+                        {can("manage_alerts") && state !== "resolved" ? (
+                          <div className="mt-2 flex gap-1.5">
+                            <Button variant="secondary" size="sm" disabled={state === "acknowledged"} onClick={() => { setAlertStates((s) => ({ ...s, [a.id]: "acknowledged" })); show("Alert acknowledged", { description: a.title, tone: "info" }); }}>
+                              <Check className="h-3.5 w-3.5" /> Ack
+                            </Button>
+                            <Button variant="primary" size="sm" onClick={() => { setAlertStates((s) => ({ ...s, [a.id]: "resolved" })); show("Alert resolved", { description: a.title }); }}>
+                              Resolve
+                            </Button>
+                          </div>
+                        ) : null}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </Card>
@@ -288,6 +323,9 @@ export default function StationDetailPage({ params }: { params: { id: string } }
       ) : (
         <div className="mt-5"><StationControls station={station} /></div>
       )}
+
+      <QrModal open={qrOpen} onClose={() => setQrOpen(false)} station={station} />
+      <BmsModal open={bmsBay !== null} onClose={() => setBmsBay(null)} bay={bmsBay} stationCode={station.code} />
     </div>
   );
 }
