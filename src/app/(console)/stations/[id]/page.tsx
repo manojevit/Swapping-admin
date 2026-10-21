@@ -17,6 +17,7 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { BayCard } from "@/components/dashboard/bay-card";
 import { StationControls } from "@/components/dashboard/station-controls";
 import { QrModal, BmsModal } from "@/components/dashboard/station-modals";
+import { StationLocationPicker } from "@/components/dashboard/station-location-picker";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
 import { useToast } from "@/components/ui/toast";
@@ -122,6 +123,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
               <Field label="Display name" defaultValue={station.name} required />
               <Field label="Location" defaultValue={station.location} required />
               <Field label="Address" defaultValue={station.address} />
+              <StationLocationPicker initialLat={station.lat} initialLng={station.lng} />
               <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={station.status[0].toUpperCase() + station.status.slice(1)} required />
             </FormDialog>
           ) : null}

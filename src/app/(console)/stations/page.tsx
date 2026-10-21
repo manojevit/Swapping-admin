@@ -13,6 +13,7 @@ import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
 import { QrModal } from "@/components/dashboard/station-modals";
+import { StationLocationPicker } from "@/components/dashboard/station-location-picker";
 import { useToast } from "@/components/ui/toast";
 import { STATIONS, ORGS, getStationDetail } from "@/lib/mock";
 import { useSession } from "@/lib/session";
@@ -86,6 +87,7 @@ export default function StationsPage() {
               <Field label="Display name" placeholder="e.g. EVX-SECTOR 20" optional />
               <SelectField label="Organisation" options={ORGS.map((o) => o.name)} required />
               <Field label="Location" placeholder="City, State" required />
+              <StationLocationPicker />
               <Field label="Total bays" type="number" placeholder="9" required />
             </FormDialog>
           ) : undefined
@@ -156,6 +158,7 @@ export default function StationsPage() {
                       <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${s.code}`} description="Update station details." submitLabel="Save changes">
                         <Field label="Display name" defaultValue={s.name} required />
                         <Field label="Location" defaultValue={s.location} required />
+                        <StationLocationPicker initialLat={s.lat} initialLng={s.lng} />
                         <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={LABEL[s.status]} required />
                       </FormDialog>
                     ) : null}
