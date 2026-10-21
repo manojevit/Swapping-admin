@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, Bike, Radio, ArrowLeftRight, Package, BatteryCharging } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Bike } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/lib/session";
-import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
 
 const EMAIL_FOR: Record<Role, string> = {
@@ -43,45 +43,69 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-sidebar px-4 py-10">
-      {/* Backdrop: tech grid + brand glows */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
-          backgroundSize: "46px 46px",
-          maskImage: "radial-gradient(ellipse 75% 65% at 50% 38%, #000 40%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(ellipse 75% 65% at 50% 38%, #000 40%, transparent 100%)",
-        }}
-      />
-      <span className="pointer-events-none absolute left-1/2 top-[-12%] h-[460px] w-[640px] -translate-x-1/2 rounded-full bg-brand-600/25 blur-[130px]" />
-      <span className="pointer-events-none absolute bottom-[-18%] right-[-6%] h-[380px] w-[420px] rounded-full bg-brand-500/15 blur-[120px]" />
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.08fr_460px]">
+      {/* Product showcase panel */}
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-11 text-white lg:flex">
+        <span className="pointer-events-none absolute left-1/4 top-[-10%] h-72 w-[36rem] rounded-full bg-brand-600/15 blur-[120px]" />
 
-      {/* Floating live-stat chips (desktop only) */}
-      <LiveChip className="left-10 top-14" icon={<Radio className="h-4 w-4" />} dot="success" value="4" label="stations online" />
-      <LiveChip className="right-12 top-24" icon={<ArrowLeftRight className="h-4 w-4" />} dot="info" value="3" label="active swaps" live />
-      <LiveChip className="bottom-28 left-16" icon={<Package className="h-4 w-4" />} dot="warn" value="86" label="packs ready" />
-      <LiveChip className="bottom-16 right-16" icon={<BatteryCharging className="h-4 w-4" />} dot="success" value="144" label="batteries healthy" />
-
-      {/* Foreground */}
-      <div className="animate-pop relative z-10 w-full max-w-[420px]">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <Logo tone="light" width={188} />
-          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] font-medium text-sidebar-muted backdrop-blur">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-            </span>
-            Operations console · live
-          </span>
+        <div className="relative">
+          <Logo tone="light" width={208} />
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-surface p-7 shadow-pop sm:p-8">
-          <h2 className="text-[22px] font-semibold tracking-tight text-ink">Welcome back</h2>
-          <p className="mt-1 text-[14px] text-muted">Choose your role and sign in to the console.</p>
+        <div className="relative mt-6">
+          <h1 className="max-w-md text-[30px] font-semibold leading-[1.18] tracking-tight">
+            Run your whole swapping network from one screen.
+          </h1>
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-sidebar-muted">
+            Stations, batteries, swaps, riders and revenue — live, and in your control.
+          </p>
+        </div>
 
-          <form onSubmit={submit} className="mt-6 space-y-5">
+        {/* Live product preview: console in a browser frame + the rider app on a phone */}
+        <div className="relative mt-10 flex-1">
+          <div className="relative mx-auto w-full max-w-[640px] translate-y-6">
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0f1830] shadow-2xl">
+              <div className="flex h-9 items-center gap-1.5 border-b border-white/10 px-4">
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                <span className="ml-3 flex-1 truncate text-[11px] text-white/30">console.evchargex.app/overview</span>
+              </div>
+              <Image
+                src="/preview/console.png"
+                alt="EVCHARGEX console — network overview"
+                width={1536}
+                height={1024}
+                priority
+                className="w-full"
+              />
+            </div>
+
+            {/* Rider app, overlapping bottom-left */}
+            <div className="absolute -bottom-4 -left-6 w-[128px] rotate-[-6deg] overflow-hidden rounded-[1.7rem] border-[5px] border-[#0f1830] bg-black shadow-2xl sm:w-[140px]">
+              <Image
+                src="/preview/app.png"
+                alt="EVCHARGEX rider app — station detail"
+                width={1170}
+                height={2532}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sign-in panel */}
+      <section className="flex items-center justify-center bg-surface px-6 py-12">
+        <div className="w-full max-w-[384px]">
+          <div className="mb-9 lg:hidden">
+            <Logo tone="dark" width={168} />
+          </div>
+
+          <h2 className="text-[24px] font-semibold tracking-tight text-ink">Sign in to the console</h2>
+          <p className="mt-1.5 text-[14px] text-muted">Choose your role and continue.</p>
+
+          <form onSubmit={submit} className="mt-7 space-y-5">
             <div>
               <Label className="mb-2 block">Sign in as</Label>
               <Tabs value={role} onValueChange={pickRole}>
@@ -123,44 +147,12 @@ export default function LoginPage() {
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
+
+          <p className="mt-8 text-[13px] text-muted">
+            Need access? <Link href="/overview" className="font-semibold text-brand-600 hover:text-brand-700">Ask your administrator</Link>
+          </p>
         </div>
-
-        <p className="mt-5 text-center text-[12px] text-sidebar-muted">
-          Need access? <Link href="/overview" className="font-medium text-white/80 hover:text-white">Ask your administrator</Link>
-          <span className="mx-2 text-white/20">·</span>
-          © 2026 EVCHARGEX
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function LiveChip({
-  className,
-  icon,
-  value,
-  label,
-  dot,
-  live,
-}: {
-  className?: string;
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  dot: "success" | "info" | "warn";
-  live?: boolean;
-}) {
-  const dotColor = { success: "bg-success", info: "bg-info", warn: "bg-warn" }[dot];
-  return (
-    <div className={cn("absolute z-10 hidden items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 shadow-lg backdrop-blur-md xl:flex", className)}>
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white/80">{icon}</span>
-      <div className="leading-tight">
-        <p className="flex items-center gap-1.5 text-[15px] font-semibold text-white">
-          <span className={cn("h-1.5 w-1.5 rounded-full", dotColor, live && "animate-pulse")} />
-          {value}
-        </p>
-        <p className="text-[11px] text-sidebar-muted">{label}</p>
-      </div>
+      </section>
     </div>
   );
 }
