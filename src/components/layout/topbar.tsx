@@ -23,29 +23,34 @@ export function Topbar() {
         </kbd>
       </div>
 
-      <RoleSwitcher />
+      {/* Right-aligned cluster */}
+      <div className="ml-auto flex items-center gap-3">
+        <RoleSwitcher />
 
-      {/* Notifications */}
-      <button className="relative grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-black/5 hover:text-ink">
-        <Bell className="h-5 w-5" />
-        <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">
-          12
-        </span>
-      </button>
+        <span className="h-6 w-px bg-line" />
 
-      {/* User */}
-      <button className="flex items-center gap-2.5 rounded-xl py-1 pl-1 pr-2 hover:bg-black/5">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-[13px] font-bold text-white">
-          {initial}
-        </span>
-        <span className="hidden text-left leading-tight sm:block">
-          <span className="block text-[13px] font-semibold text-ink">{user.name}</span>
-          <span className="block text-[11px] text-muted">
-            {user.role === "admin" ? "Super admin" : "Fleet operator"}
+        {/* Notifications */}
+        <button className="relative grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-black/5 hover:text-ink">
+          <Bell className="h-5 w-5" />
+          <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">
+            12
           </span>
-        </span>
-        <ChevronDown className="h-4 w-4 text-faint" />
-      </button>
+        </button>
+
+        {/* User */}
+        <button className="flex items-center gap-2.5 rounded-xl py-1 pl-1 pr-2 hover:bg-black/5">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-[13px] font-bold text-white">
+            {initial}
+          </span>
+          <span className="hidden text-left leading-tight sm:block">
+            <span className="block text-[13px] font-semibold text-ink">{user.name}</span>
+            <span className="block text-[11px] text-muted">
+              {user.role === "admin" ? "Super admin" : "Fleet operator"}
+            </span>
+          </span>
+          <ChevronDown className="h-4 w-4 text-faint" />
+        </button>
+      </div>
     </header>
   );
 }
