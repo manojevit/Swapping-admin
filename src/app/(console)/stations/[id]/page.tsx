@@ -54,15 +54,15 @@ export default function StationDetailPage({ params }: { params: { id: string } }
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="nums text-[30px] font-bold leading-tight text-ink">{station.code}</h1>
+            <h1 className="nums text-[26px] font-semibold leading-tight tracking-tight text-ink">{station.code}</h1>
             <StatusPill tone={TONE[station.status]}>{station.status[0].toUpperCase() + station.status.slice(1)}</StatusPill>
           </div>
           <p className="mt-1 max-w-3xl text-[14px] text-muted">{station.name} · {station.address}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="lg"><QrCode className="h-4 w-4" /> QR (PNG)</Button>
-          <Button variant="secondary" size="lg"><FileDown className="h-4 w-4" /> Download SVG</Button>
-          {can("manage_stations") ? <Button variant="primary" size="lg"><Pencil className="h-4 w-4" /> Edit Station</Button> : null}
+          <Button variant="secondary"><QrCode className="h-4 w-4" /> QR</Button>
+          <Button variant="secondary"><FileDown className="h-4 w-4" /> SVG</Button>
+          {can("manage_stations") ? <Button variant="primary"><Pencil className="h-4 w-4" /> Edit station</Button> : null}
         </div>
       </div>
 
@@ -74,20 +74,6 @@ export default function StationDetailPage({ params }: { params: { id: string } }
         <KpiCard icon={<TriangleAlert className="h-5 w-5" />} label="Faulted bays" value={faulted} sub={faulted > 0 ? "need attention" : "none"} tone={faulted > 0 ? "danger" : "neutral"} />
       </div>
 
-      {/* Last swap */}
-      {station.lastSwap ? (
-        <Card className="mt-4 flex flex-wrap items-center justify-between gap-3 p-5">
-          <div>
-            <p className="text-[13px] font-semibold text-ink">Last swap at this station</p>
-            <p className="nums mt-1 text-[13px] text-muted">
-              {station.lastSwap.id} · <span className="font-semibold text-success-ink">completed</span> · {station.lastSwap.outcome} · bay {station.lastSwap.bayIn} in / {station.lastSwap.bayOut} out
-            </p>
-            <p className="mt-0.5 text-[12px] text-faint">Started {fmt(station.lastSwap.startedAt)}. It has finished. The station is free for the next rider.</p>
-          </div>
-          <Button variant="secondary">View swap details <ChevronRight className="h-4 w-4" /></Button>
-        </Card>
-      ) : null}
-
       {/* Tabs */}
       <div className="mt-6 flex items-center gap-1 border-b border-line">
         <TabBtn active={tab === "bays"} onClick={() => setTab("bays")}>Bays &amp; info</TabBtn>
@@ -96,37 +82,53 @@ export default function StationDetailPage({ params }: { params: { id: string } }
 
       <div className="mt-5">
         {tab === "bays" ? (
-          <>
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.9fr_1fr]">
+            {/* Bays grid */}
             <Card className="p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-[15px] font-semibold text-ink">Bays ({bays.length})</h3>
-                <div className="flex flex-wrap items-center gap-4 text-[12px] text-muted">
-                  <Legend color="bg-success" label="Charged (Ready)" />
+                <h3 className="text-[15px] font-semibold text-ink">Bays <span className="text-faint">({bays.length})</span></h3>
+                <div className="flex flex-wrap items-center gap-3.5 text-[12px] text-muted">
+                  <Legend color="bg-success" label="Ready" />
                   <Legend color="bg-warn" label="Charging" />
                   <Legend color="bg-black/20" label="Empty" />
                   <Legend color="bg-danger" label="Faulted" />
                 </div>
               </div>
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {bays.map((b) => (
                   <BayCard key={b.index} bay={b} />
                 ))}
               </div>
-              <p className="mt-4 text-[12px] text-faint">
-                There is no CLOSE command anywhere in this system. The lock is fail-secure and the rider pushes the flap shut by hand — a bay that will not close is a physical problem, not a missing button.
+              <p className="mt-4 border-t border-line pt-3 text-[12px] leading-relaxed text-faint">
+                There is no CLOSE command in this system — the lock is fail-secure and the rider pushes the flap shut by hand. A bay that will not close is a physical problem, not a missing button.
               </p>
             </Card>
 
-            <Card className="mt-4 p-5">
-              <h3 className="text-[15px] font-semibold text-ink">Station information</h3>
-              <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                <Info icon={<MapPin className="h-4 w-4" />} label="Address" value={station.address} />
-                <Info icon={<Building2 className="h-4 w-4" />} label="Organisation" value={orgName} />
-                <Info icon={<MapIcon className="h-4 w-4" />} label="Location ID" value={station.locationId} />
-                <Info icon={<CalendarDays className="h-4 w-4" />} label="Installed on" value={station.installedOn} />
-              </div>
-            </Card>
-          </>
+            {/* Sidebar */}
+            <div className="space-y-4">
+              {station.lastSwap ? (
+                <Card className="p-5">
+                  <h3 className="text-[13px] font-semibold text-ink">Last swap</h3>
+                  <p className="nums mt-2 text-[13px] text-muted">
+                    <span className="font-semibold text-success-ink">Completed</span> · bay {station.lastSwap.bayIn} in / {station.lastSwap.bayOut} out
+                  </p>
+                  <p className="nums mt-0.5 truncate text-[12px] text-faint">{station.lastSwap.id}</p>
+                  <p className="mt-1 text-[12px] text-faint">{fmt(station.lastSwap.startedAt)} · station free for the next rider.</p>
+                  <Button variant="secondary" size="sm" className="mt-3 w-full">View swap details</Button>
+                </Card>
+              ) : null}
+
+              <Card className="p-5">
+                <h3 className="text-[13px] font-semibold text-ink">Station information</h3>
+                <div className="mt-3 space-y-3.5">
+                  <Info icon={<MapPin className="h-4 w-4" />} label="Address" value={station.address} />
+                  <Info icon={<Building2 className="h-4 w-4" />} label="Organisation" value={orgName} />
+                  <Info icon={<MapIcon className="h-4 w-4" />} label="Location ID" value={station.locationId} />
+                  <Info icon={<CalendarDays className="h-4 w-4" />} label="Installed on" value={station.installedOn} />
+                </div>
+              </Card>
+            </div>
+          </div>
         ) : (
           <StationControls station={station} />
         )}
@@ -162,9 +164,9 @@ function Info({ icon, label, value }: { icon: React.ReactNode; label: string; va
   return (
     <div className="flex items-start gap-2.5">
       <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600">{icon}</span>
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-faint">{label}</p>
-        <p className="mt-0.5 text-[13px] text-ink">{value}</p>
+      <div className="min-w-0">
+        <p className="text-[12px] font-medium text-faint">{label}</p>
+        <p className="mt-0.5 text-[13px] leading-snug text-ink">{value}</p>
       </div>
     </div>
   );
