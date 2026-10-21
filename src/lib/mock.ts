@@ -148,16 +148,16 @@ export const SWAP_KPIS = { completed: 167, batteryReturned: 4, failed: 21, runni
 export const ALERT_KPIS = { critical: 2, warning: 95, info: 3, open: 12, resolved: 88 };
 
 export const RIDERS: Rider[] = [
-  { id: "RIDER00001", name: "Rahul", phone: "+91 98*** 1856", orgId: "evipilot", city: null, vehicle: "HR 68 A 1201", batteryId: "INCBZG5145M0685", batterySoc: 92, status: "active", swaps: 24, swapAllowed: true },
-  { id: "RIDER00002", name: "Manoj", phone: "+91 78*** 1845", orgId: "evipilot", city: "Delhi", vehicle: "HR 68 A 1202", batteryId: "INCBZG5145M0686", batterySoc: 68, status: "active", swaps: 16, swapAllowed: true },
-  { id: "RIDER00003", name: "RAHUL Soni", phone: "+91 88*** 4150", orgId: "evipilot", city: null, vehicle: "CH 01 BX 4410", batteryId: "INCBZG5145M0687", batterySoc: 76, status: "active", swaps: 12, swapAllowed: true },
-  { id: "RIDER00004", name: "Riplav", phone: "+91 70*** 6390", orgId: "evipilot", city: null, vehicle: "CH 01 BX 4411", batteryId: "INCBZG5145M0688", batterySoc: 84, status: "suspended", swaps: 4, swapAllowed: false },
-  { id: "RIDER00005", name: "Alice Tester", phone: "+91 91*** 6313", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 8, swapAllowed: true },
-  { id: "RIDER00006", name: "Sameer Khan", phone: "+91 92*** 0286", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 5, swapAllowed: true },
-  { id: "RIDER00007", name: "Neha Sharma", phone: "+91 93*** 4512", orgId: "evipilot", city: "Noida", vehicle: "DL 10 AB 7780", batteryId: "INCBZG5145M0690", batterySoc: 61, status: "active", swaps: 19, swapAllowed: true },
-  { id: "RIDER00008", name: "Amit Verma", phone: "+91 93*** 2097", orgId: "evipilot", city: "Gurugram", vehicle: "HR 26 CD 3321", batteryId: "INCBZG5145M0691", batterySoc: 73, status: "active", swaps: 7, swapAllowed: true },
-  { id: "RIDER00009", name: "Shahbaz Idrishi", phone: "+91 83*** 0191", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "suspended", swaps: 3, swapAllowed: false },
-  { id: "RIDER00010", name: "Saurabh", phone: "+91 97*** 7480", orgId: "evit", city: "New Delhi", vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 2, swapAllowed: true },
+  { id: "RIDER00001", name: "Rahul", phone: "+91 98341 71856", orgId: "evipilot", city: null, vehicle: "HR 68 A 1201", batteryId: "INCBZG5145M0685", batterySoc: 92, status: "active", swaps: 24, swapAllowed: true },
+  { id: "RIDER00002", name: "Manoj", phone: "+91 78265 41845", orgId: "evipilot", city: "Delhi", vehicle: "HR 68 A 1202", batteryId: "INCBZG5145M0686", batterySoc: 68, status: "active", swaps: 16, swapAllowed: true },
+  { id: "RIDER00003", name: "RAHUL Soni", phone: "+91 88720 94150", orgId: "evipilot", city: null, vehicle: "CH 01 BX 4410", batteryId: "INCBZG5145M0687", batterySoc: 76, status: "active", swaps: 12, swapAllowed: true },
+  { id: "RIDER00004", name: "Riplav", phone: "+91 70114 86390", orgId: "evipilot", city: null, vehicle: "CH 01 BX 4411", batteryId: "INCBZG5145M0688", batterySoc: 84, status: "suspended", swaps: 4, swapAllowed: false },
+  { id: "RIDER00005", name: "Alice Tester", phone: "+91 91903 56313", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 8, swapAllowed: true },
+  { id: "RIDER00006", name: "Sameer Khan", phone: "+91 92056 70286", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 5, swapAllowed: true },
+  { id: "RIDER00007", name: "Neha Sharma", phone: "+91 93681 24512", orgId: "evipilot", city: "Noida", vehicle: "DL 10 AB 7780", batteryId: "INCBZG5145M0690", batterySoc: 61, status: "active", swaps: 19, swapAllowed: true },
+  { id: "RIDER00008", name: "Amit Verma", phone: "+91 93420 72097", orgId: "evipilot", city: "Gurugram", vehicle: "HR 26 CD 3321", batteryId: "INCBZG5145M0691", batterySoc: 73, status: "active", swaps: 7, swapAllowed: true },
+  { id: "RIDER00009", name: "Shahbaz Idrishi", phone: "+91 83991 40191", orgId: "evipilot", city: null, vehicle: null, batteryId: null, batterySoc: null, status: "suspended", swaps: 3, swapAllowed: false },
+  { id: "RIDER00010", name: "Saurabh", phone: "+91 97800 57480", orgId: "evit", city: "New Delhi", vehicle: null, batteryId: null, batterySoc: null, status: "active", swaps: 2, swapAllowed: true },
 ];
 
 export const VEHICLES: Vehicle[] = [
