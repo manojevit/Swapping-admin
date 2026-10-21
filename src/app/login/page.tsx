@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck, Bike } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { SwapStationArt } from "@/components/brand/swap-station-art";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,37 +61,15 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Live product preview: console in a browser frame + the rider app on a phone */}
-        <div className="relative mt-10 flex-1">
-          <div className="relative mx-auto w-full max-w-[640px] translate-y-6">
-            <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0f1830] shadow-2xl">
-              <div className="flex h-9 items-center gap-1.5 border-b border-white/10 px-4">
-                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-                <span className="ml-3 flex-1 truncate text-[11px] text-white/30">console.evchargex.app/overview</span>
-              </div>
-              <Image
-                src="/preview/console.png"
-                alt="EVCHARGEX console — network overview"
-                width={1536}
-                height={1024}
-                priority
-                className="w-full"
-              />
-            </div>
+        {/* Illustration: a battery-swap cabinet with live bay status */}
+        <div className="relative mt-4 flex flex-1 flex-col justify-center">
+          <SwapStationArt className="mx-auto h-auto w-full max-w-[380px]" />
 
-            {/* Rider app, overlapping bottom-left */}
-            <div className="absolute -bottom-4 -left-6 w-[128px] rotate-[-6deg] overflow-hidden rounded-[1.7rem] border-[5px] border-[#0f1830] bg-black shadow-2xl sm:w-[140px]">
-              <Image
-                src="/preview/app.png"
-                alt="EVCHARGEX rider app — station detail"
-                width={1170}
-                height={2532}
-                className="w-full"
-              />
-            </div>
-          </div>
+          <dl className="relative mt-2 grid grid-cols-3 gap-4 border-t border-sidebar-line pt-6">
+            <Stat value="4" label="Stations online" />
+            <Stat value="86" label="Packs ready" />
+            <Stat value="18" label="Swaps today" />
+          </dl>
         </div>
       </section>
 
@@ -153,6 +131,15 @@ export default function LoginPage() {
           </p>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <dd className="text-[22px] font-semibold tracking-tight text-white">{value}</dd>
+      <dt className="mt-0.5 text-[12px] text-sidebar-muted">{label}</dt>
     </div>
   );
 }
