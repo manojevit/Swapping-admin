@@ -151,35 +151,35 @@ export default function StationDetailPage({ params }: { params: { id: string } }
       </div>
 
       {tab === "overview" ? (
-        <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1.9fr_1fr]">
+        <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-[1.9fr_1fr]">
           {/* LEFT */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Bays */}
-            <Card className="p-5">
+            <Card className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-[15px] font-semibold text-ink">Bays <span className="text-faint">({bays.length})</span></h3>
-                <div className="flex flex-wrap items-center gap-3.5 text-[12px] text-muted">
+                <h3 className="text-[14px] font-semibold text-ink">Bays <span className="text-faint">({bays.length})</span></h3>
+                <div className="flex flex-wrap items-center gap-3 text-[12px] text-muted">
                   <Legend color="bg-success" label="Ready" />
                   <Legend color="bg-warn" label="Charging" />
                   <Legend color="bg-black/20" label="Empty" />
                   <Legend color="bg-danger" label="Faulted" />
                 </div>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                 {bays.map((b) => (<BayCard key={b.index} bay={b} onBms={setBmsBay} />))}
               </div>
-              <p className="mt-4 border-t border-line pt-3 text-[12px] leading-relaxed text-faint">
+              <p className="mt-3 border-t border-line pt-2.5 text-[12px] leading-relaxed text-faint">
                 There is no CLOSE command in this system — the lock is fail-secure and the rider pushes the flap shut by hand. A bay that will not close is a physical problem, not a missing button.
               </p>
             </Card>
 
             {/* Throughput */}
-            <Card className="p-5">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-[15px] font-semibold text-ink">Throughput</h3>
+            <Card className="p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-[14px] font-semibold text-ink">Throughput</h3>
                 <span className="text-[12px] text-muted">Swaps per hour · last 24h</span>
               </div>
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={130}>
                 <BarChart data={throughput} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#EDF1F6" vertical={false} />
                   <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "#9AA4B2" }} tickLine={false} axisLine={false} interval={5} />
@@ -191,13 +191,13 @@ export default function StationDetailPage({ params }: { params: { id: string } }
 
             {/* Recent swaps */}
             <Card>
-              <div className="flex items-center justify-between px-5 pt-5">
-                <h3 className="text-[15px] font-semibold text-ink">Recent swaps</h3>
+              <div className="flex items-center justify-between px-4 pt-4">
+                <h3 className="text-[14px] font-semibold text-ink">Recent swaps</h3>
                 <Link href="/swaps" className="text-[13px] font-semibold text-brand-600 hover:text-brand-700">View all</Link>
               </div>
-              <div className="mt-3">
+              <div className="mt-2.5">
                 {recentSwaps.length === 0 ? (
-                  <p className="px-5 pb-5 text-[13px] text-muted">No swaps recorded at this station yet.</p>
+                  <p className="px-4 pb-4 text-[13px] text-muted">No swaps recorded at this station yet.</p>
                 ) : (
                   <Table>
                     <THead><TH>When</TH><TH>Rider</TH><TH>Bays</TH><TH>Pack out</TH><TH align="right">Outcome</TH></THead>
@@ -222,22 +222,22 @@ export default function StationDetailPage({ params }: { params: { id: string } }
           </div>
 
           {/* RIGHT */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Uptime & connectivity */}
-            <Card className="p-5">
+            <Card className="p-4">
               <div className="flex items-center gap-2"><Wifi className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Uptime &amp; connectivity</h3></div>
-              <p className="nums mt-3 text-[26px] font-bold leading-none text-ink">{uptimePct}%</p>
+              <p className="nums mt-2 text-[22px] font-bold leading-none text-ink">{uptimePct}%</p>
               <p className="mt-1 text-[12px] text-faint">Last heartbeat {timeAgo(station.lastSeen)}</p>
-              <div className="mt-3 flex items-end gap-[3px]">
+              <div className="mt-2.5 flex items-end gap-[3px]">
                 {segments.map((up, i) => (
-                  <span key={i} className={cn("h-6 flex-1 rounded-[2px]", up ? "bg-success/70" : "bg-danger/70")} title={`${String(i).padStart(2, "0")}:00`} />
+                  <span key={i} className={cn("h-5 flex-1 rounded-[2px]", up ? "bg-success/70" : "bg-danger/70")} title={`${String(i).padStart(2, "0")}:00`} />
                 ))}
               </div>
               <p className="mt-2 text-[11px] text-faint">Hourly, last 24h</p>
             </Card>
 
             {/* Open alerts */}
-            <Card className="p-5">
+            <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2"><TriangleAlert className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Open alerts</h3></div>
                 {stationAlerts.length > 0 ? <span className="rounded-full bg-danger-soft px-2 py-0.5 text-[11px] font-bold text-danger-ink">{stationAlerts.length}</span> : null}
@@ -281,7 +281,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
             </Card>
 
             {/* Battery health */}
-            <Card className="p-5">
+            <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2"><HeartPulse className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Pack health (SoH)</h3></div>
                 <span className="nums text-[13px] font-semibold text-ink">avg {avgSoh}%</span>
@@ -295,21 +295,21 @@ export default function StationDetailPage({ params }: { params: { id: string } }
 
             {/* Location */}
             <Card className="overflow-hidden">
-              <div className="flex items-center justify-between px-5 pt-5">
+              <div className="flex items-center justify-between px-4 pt-4">
                 <div className="flex items-center gap-2"><MapIcon className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Location</h3></div>
                 <a href={`https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[12px] font-semibold text-brand-600 hover:text-brand-700">
                   <Navigation className="h-3.5 w-3.5" /> Directions
                 </a>
               </div>
-              <div className="mt-3 h-[180px] w-full px-3 pb-3">
+              <div className="mt-2.5 h-[150px] w-full px-2.5 pb-2.5">
                 <NetworkMap stations={[station]} />
               </div>
             </Card>
 
             {/* Station information */}
-            <Card className="p-5">
+            <Card className="p-4">
               <h3 className="text-[13px] font-semibold text-ink">Station information</h3>
-              <div className="mt-3 space-y-3.5">
+              <div className="mt-3 space-y-3">
                 <Info icon={<MapPin className="h-4 w-4" />} label="Address" value={station.address} />
                 <Info icon={<Building2 className="h-4 w-4" />} label="Organisation" value={orgName} />
                 <Info icon={<CalendarDays className="h-4 w-4" />} label="Installed on" value={station.installedOn} />
