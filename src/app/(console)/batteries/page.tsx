@@ -10,11 +10,15 @@ import { PercentBar } from "@/components/ui/percent-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { RowMenu } from "@/components/ui/row-menu";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
 import { BATTERIES, BATTERY_KPIS, ORGS, STATIONS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { exportCsv, timeAgo } from "@/lib/utils";
+
+type Battery = (typeof BATTERIES)[number];
 import type { BatteryHealth } from "@/lib/types";
 
 const HEALTH_LABEL: Record<BatteryHealth, string> = { healthy: "Healthy", low: "Low", fault: "Fault", unknown: "Unknown" };
@@ -31,17 +35,20 @@ export default function BatteriesPage() {
   const [stationFilter, setStationFilter] = useState("All stations");
   const [refreshing, setRefreshing] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [deleted, setDeleted] = useState<Set<string>>(() => new Set());
+  const [pending, setPending] = useState<Battery | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return base.filter((b) => {
+      if (deleted.has(b.id)) return false;
       if (q && !`${b.id} ${b.brand}`.toLowerCase().includes(q)) return false;
       if (orgFilter !== "All organisations" && orgName(b.orgId) !== orgFilter) return false;
       if (stationFilter !== "All stations" && !b.whereLabel.includes(stationFilter)) return false;
       return true;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, query, orgFilter, stationFilter]);
+  }, [base, query, orgFilter, stationFilter, deleted]);
 
   const k = user.orgId
     ? {
@@ -153,6 +160,12 @@ export default function BatteriesPage() {
                         <SelectField label="Organisation" options={ORGS.map((o) => o.name)} defaultValue={orgName(b.orgId)} required />
                         <SelectField label="Health" options={["Healthy", "Low", "Fault"]} defaultValue={HEALTH_LABEL[b.health]} required />
                       </FormDialog>
+                      <RowMenu
+                        items={[
+                          { label: "Retire battery", onClick: () => show("Battery retired", { description: b.id, tone: "warn" }) },
+                          { label: "Delete battery", danger: true, divider: true, onClick: () => setPending(b) },
+                        ]}
+                      />
                     </div>
                   ) : <span className="text-[12px] text-faint">—</span>}
                 </TD>
@@ -164,6 +177,14 @@ export default function BatteriesPage() {
       </Card>
 
       <BulkUploadModal open={bulkOpen} onClose={() => setBulkOpen(false)} />
+      <ConfirmDialog
+        open={!!pending}
+        onClose={() => setPending(null)}
+        onConfirm={() => { if (pending) { const id = pending.id; setDeleted((s) => new Set(s).add(id)); show("Battery deleted", { description: pending.id, tone: "warn" }); } }}
+        title={`Delete ${pending?.id ?? ""}?`}
+        description="This removes the pack from inventory. Consider Retire to keep its telemetry history."
+        confirmLabel="Delete battery"
+      />
     </div>
   );
 }

@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import {
   QrCode, FileDown, Pencil, Activity, Package, Zap, TriangleAlert, ChevronRight, MapPin, Building2,
-  Map as MapIcon, CalendarDays, Wifi, HeartPulse, ArrowRight, Check, CheckCheck, Navigation, Cpu, ArrowLeftRight,
+  Map as MapIcon, CalendarDays, Wifi, HeartPulse, ArrowRight, Check, CheckCheck, Navigation, Cpu, ArrowLeftRight, Power, Trash2,
 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,11 +46,13 @@ const SEV: Record<AlertSeverity, "danger" | "warn" | "info"> = { critical: "dang
 export default function StationDetailPage({ params }: { params: { id: string } }) {
   const { can } = useSession();
   const { show } = useToast();
+  const router = useRouter();
   const station = getStationDetail(params.id);
   const [tab, setTab] = useState<"overview" | "controls">("overview");
   const [qrOpen, setQrOpen] = useState(false);
   const [bmsBay, setBmsBay] = useState<Bay | null>(null);
   const [alertStates, setAlertStates] = useState<Record<string, AlertState>>({});
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!station) notFound();
 
@@ -121,6 +124,12 @@ export default function StationDetailPage({ params }: { params: { id: string } }
               <Field label="Address" defaultValue={station.address} />
               <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={station.status[0].toUpperCase() + station.status.slice(1)} required />
             </FormDialog>
+          ) : null}
+          {can("manage_stations") ? (
+            <>
+              <Button variant="secondary" onClick={() => show("Station decommissioned", { description: `${station.code} taken offline`, tone: "warn" })}><Power className="h-4 w-4" /> Decommission</Button>
+              <Button variant="danger" onClick={() => setConfirmDelete(true)}><Trash2 className="h-4 w-4" /> Delete</Button>
+            </>
           ) : null}
         </div>
       </div>
@@ -326,6 +335,16 @@ export default function StationDetailPage({ params }: { params: { id: string } }
 
       <QrModal open={qrOpen} onClose={() => setQrOpen(false)} station={station} />
       <BmsModal open={bmsBay !== null} onClose={() => setBmsBay(null)} bay={bmsBay} stationCode={station.code} />
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => { show("Station deleted", { description: station.code, tone: "warn" }); router.push("/stations"); }}
+        title={`Delete ${station.code}?`}
+        description="This removes the station and unlinks its bays and command history."
+        confirmLabel="Delete station"
+      >
+        <p className="text-[13px] text-muted">Prefer <span className="font-semibold text-ink">Decommission</span> if you only need to take it offline — that keeps its swap history. Delete cannot be undone.</p>
+      </ConfirmDialog>
     </div>
   );
 }

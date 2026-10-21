@@ -11,11 +11,15 @@ import { PercentBar } from "@/components/ui/percent-bar";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { RowMenu } from "@/components/ui/row-menu";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
 import { VEHICLES, VEHICLE_KPIS, ORGS, RIDERS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { exportCsv } from "@/lib/utils";
+
+type Vehicle = (typeof VEHICLES)[number];
 
 const MODELS = ["SHEMA LS", "SHEMA", "SHEMA EAGLE"];
 
@@ -32,10 +36,13 @@ export default function VehiclesPage() {
   const [modelFilter, setModelFilter] = useState("All models");
   const [refreshing, setRefreshing] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [deleted, setDeleted] = useState<Set<string>>(() => new Set());
+  const [pending, setPending] = useState<Vehicle | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return base.filter((v) => {
+      if (deleted.has(v.id)) return false;
       if (q && !`${v.code} ${v.id} ${v.chassis} ${v.rider ?? ""}`.toLowerCase().includes(q)) return false;
       if (orgFilter !== "All organisations" && orgName(v.orgId) !== orgFilter) return false;
       if (statusFilter !== "All status" && (statusFilter === "On road") !== (v.status === "on_road")) return false;
@@ -43,7 +50,7 @@ export default function VehiclesPage() {
       return true;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, query, orgFilter, statusFilter, modelFilter]);
+  }, [base, query, orgFilter, statusFilter, modelFilter, deleted]);
 
   const k = user.orgId
     ? {
@@ -166,6 +173,12 @@ export default function VehiclesPage() {
                         <SelectField label="Model" options={MODELS} defaultValue={v.model} required />
                         <SelectField label="Status" options={["On road", "Off road"]} defaultValue={v.status === "on_road" ? "On road" : "Off road"} />
                       </FormDialog>
+                      <RowMenu
+                        items={[
+                          { label: v.status === "on_road" ? "Take off road" : "Put on road", onClick: () => show(v.status === "on_road" ? "Vehicle taken off road" : "Vehicle put on road", { description: v.code, tone: "warn" }) },
+                          { label: "Delete vehicle", danger: true, divider: true, onClick: () => setPending(v) },
+                        ]}
+                      />
                     </div>
                   ) : <span className="text-[12px] text-faint">—</span>}
                 </TD>
@@ -177,6 +190,14 @@ export default function VehiclesPage() {
       </Card>
 
       <BulkUploadModal open={bulkOpen} onClose={() => setBulkOpen(false)} />
+      <ConfirmDialog
+        open={!!pending}
+        onClose={() => setPending(null)}
+        onConfirm={() => { if (pending) { const id = pending.id; setDeleted((s) => new Set(s).add(id)); show("Vehicle deleted", { description: pending.code, tone: "warn" }); } }}
+        title={`Delete ${pending?.code ?? ""}?`}
+        description="This removes the vehicle from the fleet. Consider taking it off road instead to keep its history."
+        confirmLabel="Delete vehicle"
+      />
     </div>
   );
 }

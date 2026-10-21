@@ -10,10 +10,14 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { RowMenu } from "@/components/ui/row-menu";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
 import { RIDERS, RIDER_KPIS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
 import { exportCsv } from "@/lib/utils";
+
+type Rider = (typeof RIDERS)[number];
 
 export default function RidersPage() {
   const { user, can } = useSession();
@@ -27,10 +31,13 @@ export default function RidersPage() {
   const [statusFilter, setStatusFilter] = useState("All status");
   const [permFilter, setPermFilter] = useState("All permission");
   const [refreshing, setRefreshing] = useState(false);
+  const [deleted, setDeleted] = useState<Set<string>>(() => new Set());
+  const [pending, setPending] = useState<Rider | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return base.filter((r) => {
+      if (deleted.has(r.id)) return false;
       if (q && !`${r.name} ${r.phone} ${r.id}`.toLowerCase().includes(q)) return false;
       if (orgFilter !== "All organisations" && orgName(r.orgId) !== orgFilter) return false;
       if (statusFilter !== "All status" && (statusFilter === "Active") !== (r.status === "active")) return false;
@@ -38,7 +45,7 @@ export default function RidersPage() {
       return true;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, query, orgFilter, statusFilter, permFilter]);
+  }, [base, query, orgFilter, statusFilter, permFilter, deleted]);
 
   const k = user.orgId
     ? {
@@ -145,13 +152,21 @@ export default function RidersPage() {
                 <TD><StatusPill tone={r.swapAllowed ? "success" : "danger"}>{r.swapAllowed ? "Allowed" : "Blocked"}</StatusPill></TD>
                 <TD align="right">
                   {can("manage_riders") ? (
-                    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
-                      <Field label="Full name" defaultValue={r.name} required />
-                      <Field label="Phone number" defaultValue={r.phone} required />
-                      <Field label="City" defaultValue={r.city ?? ""} optional />
-                      <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
-                      <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
-                    </FormDialog>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
+                        <Field label="Full name" defaultValue={r.name} required />
+                        <Field label="Phone number" defaultValue={r.phone} required />
+                        <Field label="City" defaultValue={r.city ?? ""} optional />
+                        <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
+                        <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
+                      </FormDialog>
+                      <RowMenu
+                        items={[
+                          { label: r.status === "active" ? "Suspend rider" : "Activate rider", onClick: () => show(r.status === "active" ? "Rider suspended" : "Rider activated", { description: r.name, tone: "warn" }) },
+                          { label: "Delete rider", danger: true, divider: true, onClick: () => setPending(r) },
+                        ]}
+                      />
+                    </div>
                   ) : <span className="text-[12px] text-faint">—</span>}
                 </TD>
               </TR>
@@ -160,6 +175,15 @@ export default function RidersPage() {
         </Table>
         <p className="px-5 py-3 text-[12px] text-faint">Showing {filtered.length} of {base.length} riders</p>
       </Card>
+
+      <ConfirmDialog
+        open={!!pending}
+        onClose={() => setPending(null)}
+        onConfirm={() => { if (pending) { const id = pending.id; setDeleted((s) => new Set(s).add(id)); show("Rider deleted", { description: pending.name, tone: "warn" }); } }}
+        title={`Delete ${pending?.name ?? ""}?`}
+        description="This removes the rider and their swap permission. Consider Suspend to keep their history."
+        confirmLabel="Delete rider"
+      />
     </div>
   );
 }
