@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, Bike } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Bike, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
-import { SwapStationArt } from "@/components/brand/swap-station-art";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,60 +42,37 @@ export default function LoginPage() {
     setTimeout(() => router.push("/overview"), 500);
   }
 
+  const tabTrigger =
+    "flex-1 gap-2 rounded-xl border border-line bg-surface text-muted data-[state=active]:border-brand-200 data-[state=active]:bg-brand-50 data-[state=active]:text-brand-700 data-[state=active]:shadow-none";
+
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.08fr_460px]">
-      {/* Product showcase panel */}
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-11 text-white lg:flex">
-        <span className="pointer-events-none absolute left-1/4 top-[-10%] h-72 w-[36rem] rounded-full bg-brand-600/15 blur-[120px]" />
+    <div className="flex min-h-screen bg-surface">
+      {/* Hero */}
+      <div className="relative hidden flex-1 lg:block">
+        <Image src="/login-hero-left.png" alt="EVCHARGEX smart battery swapping station" fill priority sizes="60vw" className="object-cover object-left" />
+      </div>
 
-        <div className="relative">
-          <Logo tone="light" width={208} />
-        </div>
+      {/* Sign-in card */}
+      <section className="flex w-full flex-col justify-center px-6 py-10 sm:px-12 lg:w-[480px] lg:shrink-0">
+        <div className="mx-auto w-full max-w-[360px]">
+          <Logo tone="dark" width={188} />
 
-        <div className="relative mt-6">
-          <h1 className="max-w-md text-[30px] font-semibold leading-[1.18] tracking-tight">
-            Run your whole swapping network from one screen.
-          </h1>
-          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-sidebar-muted">
-            Stations, batteries, swaps, riders and revenue — live, and in your control.
-          </p>
-        </div>
-
-        {/* Illustration: a battery-swap cabinet with live bay status */}
-        <div className="relative mt-4 flex flex-1 flex-col justify-center">
-          <SwapStationArt className="mx-auto h-auto w-full max-w-[380px]" />
-
-          <dl className="relative mt-2 grid grid-cols-3 gap-4 border-t border-sidebar-line pt-6">
-            <Stat value="4" label="Stations online" />
-            <Stat value="86" label="Packs ready" />
-            <Stat value="18" label="Swaps today" />
-          </dl>
-        </div>
-      </section>
-
-      {/* Sign-in panel */}
-      <section className="flex items-center justify-center bg-surface px-6 py-12">
-        <div className="w-full max-w-[384px]">
-          <div className="mb-9 lg:hidden">
-            <Logo tone="dark" width={168} />
-          </div>
-
-          <h2 className="text-[24px] font-semibold tracking-tight text-ink">Sign in to the console</h2>
-          <p className="mt-1.5 text-[14px] text-muted">Choose your role and continue.</p>
+          <h2 className="mt-9 text-[30px] font-bold leading-tight tracking-tight text-ink">Welcome back 👋</h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-muted">Sign in to your console and keep your network moving.</p>
 
           <form onSubmit={submit} className="mt-7 space-y-5">
             <div>
               <Label className="mb-2 block">Sign in as</Label>
               <Tabs value={role} onValueChange={pickRole}>
-                <TabsList>
-                  <TabsTrigger value="admin"><ShieldCheck className="h-4 w-4" /> Administrator</TabsTrigger>
-                  <TabsTrigger value="fleet_operator"><Bike className="h-4 w-4" /> Fleet operator</TabsTrigger>
+                <TabsList className="h-auto bg-transparent p-0">
+                  <TabsTrigger value="admin" className={tabTrigger}><ShieldCheck className="h-4 w-4" /> Administrator</TabsTrigger>
+                  <TabsTrigger value="fleet_operator" className={tabTrigger}><Bike className="h-4 w-4" /> Fleet operator</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email address</Label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-faint" />
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11" />
@@ -116,30 +93,21 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-0.5">
+            <div className="flex items-center gap-2.5 pt-0.5">
               <Checkbox id="remember" defaultChecked />
               <Label htmlFor="remember" className="font-normal text-muted">Keep me signed in</Label>
             </div>
 
-            <Button type="submit" variant="primary" size="lg" disabled={loading} className="h-12 w-full text-[15px]">
-              {loading ? "Signing in…" : "Sign in"}
+            <Button type="submit" variant="primary" size="lg" disabled={loading} className="h-12 w-full bg-gradient-to-r from-brand-500 to-brand-600 text-[15px] hover:from-brand-600 hover:to-brand-700">
+              {loading ? "Signing in…" : <>Sign in <ArrowRight className="h-4 w-4" /></>}
             </Button>
           </form>
 
-          <p className="mt-8 text-[13px] text-muted">
+          <p className="mt-8 text-center text-[13px] text-muted">
             Need access? <Link href="/overview" className="font-semibold text-brand-600 hover:text-brand-700">Ask your administrator</Link>
           </p>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div>
-      <dd className="text-[22px] font-semibold tracking-tight text-white">{value}</dd>
-      <dt className="mt-0.5 text-[12px] text-sidebar-muted">{label}</dt>
     </div>
   );
 }
