@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { Plus, RefreshCw, Download, Pencil, Users, UserCheck, UserX, ArrowLeftRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
@@ -9,21 +10,59 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { useToast } from "@/components/ui/toast";
 import { RIDERS, RIDER_KPIS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
+import { exportCsv } from "@/lib/utils";
 
 export default function RidersPage() {
   const { user, can } = useSession();
-  const rows = user.orgId ? RIDERS.filter((r) => r.orgId === user.orgId) : RIDERS;
+  const { show } = useToast();
   const orgName = (id: string) => ORGS.find((o) => o.id === id)?.name ?? "—";
+
+  const base = user.orgId ? RIDERS.filter((r) => r.orgId === user.orgId) : RIDERS;
+
+  const [query, setQuery] = useState("");
+  const [orgFilter, setOrgFilter] = useState("All organisations");
+  const [statusFilter, setStatusFilter] = useState("All status");
+  const [permFilter, setPermFilter] = useState("All permission");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return base.filter((r) => {
+      if (q && !`${r.name} ${r.phone} ${r.id}`.toLowerCase().includes(q)) return false;
+      if (orgFilter !== "All organisations" && orgName(r.orgId) !== orgFilter) return false;
+      if (statusFilter !== "All status" && (statusFilter === "Active") !== (r.status === "active")) return false;
+      if (permFilter !== "All permission" && (permFilter === "Allowed") !== r.swapAllowed) return false;
+      return true;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base, query, orgFilter, statusFilter, permFilter]);
+
   const k = user.orgId
     ? {
-        total: rows.length,
-        active: rows.filter((r) => r.status === "active").length,
-        suspended: rows.filter((r) => r.status === "suspended").length,
-        swapsToday: rows.reduce((a, r) => a + (r.swaps > 10 ? 2 : 1), 0),
+        total: base.length,
+        active: base.filter((r) => r.status === "active").length,
+        suspended: base.filter((r) => r.status === "suspended").length,
+        swapsToday: base.reduce((a, r) => a + (r.swaps > 10 ? 2 : 1), 0),
       }
     : RIDER_KPIS;
+
+  function refresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    setTimeout(() => { setRefreshing(false); show("Riders refreshed", { description: "Showing the latest records." }); }, 700);
+  }
+
+  function handleExport() {
+    exportCsv(
+      "riders.csv",
+      ["Rider", "Rider ID", "Phone", "Organisation", "City", "Vehicle", "Status", "Swaps", "Swap permission"],
+      filtered.map((r) => [r.name, r.id, r.phone, orgName(r.orgId), r.city ?? "", r.vehicle ?? "Unassigned", r.status === "active" ? "Active" : "Suspended", r.swaps, r.swapAllowed ? "Allowed" : "Blocked"]),
+    );
+    show("Riders exported", { description: `${filtered.length} ${filtered.length === 1 ? "row" : "rows"} · riders.csv` });
+  }
 
   return (
     <div>
@@ -52,17 +91,19 @@ export default function RidersPage() {
 
       <Toolbar
         placeholder="Search by rider name, phone number or rider ID…"
+        search={query}
+        onSearch={setQuery}
         filters={
           <>
-            {can("view_all_orgs") ? <FilterSelect label="Organisation" options={["All organisations", ...ORGS.map((o) => o.name)]} /> : null}
-            <FilterSelect label="Status" options={["All status", "Active", "Suspended"]} />
-            <FilterSelect label="Swap permission" options={["All permission", "Allowed", "Blocked"]} />
+            {can("view_all_orgs") ? <FilterSelect label="Organisation" value={orgFilter} onChange={setOrgFilter} options={["All organisations", ...ORGS.map((o) => o.name)]} /> : null}
+            <FilterSelect label="Status" value={statusFilter} onChange={setStatusFilter} options={["All status", "Active", "Suspended"]} />
+            <FilterSelect label="Swap permission" value={permFilter} onChange={setPermFilter} options={["All permission", "Allowed", "Blocked"]} />
           </>
         }
         actions={
           <>
-            <Button variant="secondary"><RefreshCw className="h-4 w-4" /> Refresh</Button>
-            <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
+            <Button variant="secondary" onClick={refresh} disabled={refreshing}><RefreshCw className={refreshing ? "h-4 w-4 animate-spin" : "h-4 w-4"} /> Refresh</Button>
+            <Button variant="secondary" onClick={handleExport}><Download className="h-4 w-4" /> Export</Button>
           </>
         }
       />
@@ -82,7 +123,9 @@ export default function RidersPage() {
             <TH align="right">Action</TH>
           </THead>
           <TBody>
-            {rows.map((r) => (
+            {filtered.length === 0 ? (
+              <TR><TD className="py-10 text-center text-muted">No riders match your filters.</TD><TD /><TD /><TD /><TD /><TD /><TD /><TD /><TD /><TD /></TR>
+            ) : filtered.map((r) => (
               <TR key={r.id}>
                 <TD>
                   <p className="text-[14px] font-semibold text-ink">{r.name}</p>
@@ -101,19 +144,21 @@ export default function RidersPage() {
                 <TD align="right" className="nums font-semibold text-ink">{r.swaps}</TD>
                 <TD><StatusPill tone={r.swapAllowed ? "success" : "danger"}>{r.swapAllowed ? "Allowed" : "Blocked"}</StatusPill></TD>
                 <TD align="right">
-                  <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
-                    <Field label="Full name" defaultValue={r.name} required />
-                    <Field label="Phone number" defaultValue={r.phone} required />
-                    <Field label="City" defaultValue={r.city ?? ""} optional />
-                    <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
-                    <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
-                  </FormDialog>
+                  {can("manage_riders") ? (
+                    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
+                      <Field label="Full name" defaultValue={r.name} required />
+                      <Field label="Phone number" defaultValue={r.phone} required />
+                      <Field label="City" defaultValue={r.city ?? ""} optional />
+                      <SelectField label="Status" options={["Active", "Suspended"]} defaultValue={r.status === "active" ? "Active" : "Suspended"} />
+                      <SelectField label="Swap permission" options={["Allowed", "Blocked"]} defaultValue={r.swapAllowed ? "Allowed" : "Blocked"} />
+                    </FormDialog>
+                  ) : <span className="text-[12px] text-faint">—</span>}
                 </TD>
               </TR>
             ))}
           </TBody>
         </Table>
-        <p className="px-5 py-3 text-[12px] text-faint">Showing 1 to {rows.length} of {k.total} riders</p>
+        <p className="px-5 py-3 text-[12px] text-faint">Showing {filtered.length} of {base.length} riders</p>
       </Card>
     </div>
   );
