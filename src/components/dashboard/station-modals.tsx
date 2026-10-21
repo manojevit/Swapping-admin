@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import NextImage from "next/image";
 import QRCode from "react-qr-code";
 import { FileDown, Image as ImageIcon, Cpu } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
@@ -18,17 +19,43 @@ function triggerDownload(href: string, name: string) {
   a.remove();
 }
 
+const LOGO_ASPECT = 3230 / 470;
+
 export function QrModal({ open, onClose, station }: { open: boolean; onClose: () => void; station: StationDetail }) {
   const ref = useRef<HTMLDivElement>(null);
   const { show } = useToast();
+  const [logoData, setLogoData] = useState<string | null>(null);
   const url = `https://console.evchargex.app/s/${station.code}`;
+
+  // Load the white logo as a data URI so it can be embedded in the exported SVG.
+  useEffect(() => {
+    if (!open || logoData) return;
+    let cancelled = false;
+    fetch("/brand/logo-white.png")
+      .then((r) => r.blob())
+      .then((b) => new Promise<string>((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result as string); fr.readAsDataURL(b); }))
+      .then((d) => { if (!cancelled) setLogoData(d); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [open, logoData]);
+
+  // Overlay geometry as fractions of the QR's own coordinate box.
+  const geo = { white: 0.26, whiteR: 0.05, pill: 0.225, pillH: 0.1, pillR: 0.04, logo: 0.185 };
 
   function downloadSvg() {
     const svg = ref.current?.querySelector("svg");
     if (!svg) return;
-    const data = new XMLSerializer().serializeToString(svg);
-    const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n', data], { type: "image/svg+xml" });
-    const objUrl = URL.createObjectURL(blob);
+    const vb = (svg.getAttribute("viewBox") || "0 0 29 29").split(" ").map(Number);
+    const N = vb[2] || 29;
+    const c = N / 2;
+    const w = N * geo.white, pw = N * geo.pill, ph = N * geo.pillH;
+    const lw = N * geo.logo, lh = lw / LOGO_ASPECT;
+    const overlay =
+      `<rect x="${c - w / 2}" y="${c - w / 2}" width="${w}" height="${w}" rx="${N * geo.whiteR}" fill="#FFFFFF"/>` +
+      `<rect x="${c - pw / 2}" y="${c - ph / 2}" width="${pw}" height="${ph}" rx="${N * geo.pillR}" fill="#0B1220"/>` +
+      (logoData ? `<image href="${logoData}" x="${c - lw / 2}" y="${c - lh / 2}" width="${lw}" height="${lh}" preserveAspectRatio="xMidYMid meet"/>` : "");
+    const composite = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N} ${N}" width="1024" height="1024">${svg.innerHTML}${overlay}</svg>`;
+    const objUrl = URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n', composite], { type: "image/svg+xml" }));
     triggerDownload(objUrl, `${station.code}-qr.svg`);
     URL.revokeObjectURL(objUrl);
     show("SVG downloaded", { description: `${station.code}-qr.svg` });
@@ -38,10 +65,9 @@ export function QrModal({ open, onClose, station }: { open: boolean; onClose: ()
     const svg = ref.current?.querySelector("svg");
     if (!svg) return;
     const data = new XMLSerializer().serializeToString(svg);
-    const svgBlob = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-    const objUrl = URL.createObjectURL(svgBlob);
-    const img = new Image();
-    img.onload = () => {
+    const objUrl = URL.createObjectURL(new Blob([data], { type: "image/svg+xml;charset=utf-8" }));
+    const qrImg = new Image();
+    qrImg.onload = () => {
       const size = 1024;
       const canvas = document.createElement("canvas");
       canvas.width = size;
@@ -50,17 +76,37 @@ export function QrModal({ open, onClose, station }: { open: boolean; onClose: ()
       if (!ctx) return;
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, size, size);
-      ctx.drawImage(img, 96, 96, size - 192, size - 192);
+      const q = size - 160;
+      ctx.drawImage(qrImg, 80, 80, q, q);
       URL.revokeObjectURL(objUrl);
-      canvas.toBlob((b) => {
+
+      const cx = size / 2;
+      const w = size * geo.white, pw = size * geo.pill, ph = size * geo.pillH;
+      roundRect(ctx, cx - w / 2, cx - w / 2, w, w, size * geo.whiteR);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+      roundRect(ctx, cx - pw / 2, cx - ph / 2, pw, ph, size * geo.pillR);
+      ctx.fillStyle = "#0B1220";
+      ctx.fill();
+
+      const finish = () => canvas.toBlob((b) => {
         if (!b) return;
         const pngUrl = URL.createObjectURL(b);
         triggerDownload(pngUrl, `${station.code}-qr.png`);
         URL.revokeObjectURL(pngUrl);
         show("PNG downloaded", { description: `${station.code}-qr.png` });
       });
+
+      const logo = new Image();
+      logo.onload = () => {
+        const lw = size * geo.logo, lh = lw / LOGO_ASPECT;
+        ctx.drawImage(logo, cx - lw / 2, cx - lh / 2, lw, lh);
+        finish();
+      };
+      logo.onerror = finish;
+      logo.src = logoData || "/brand/logo-white.png";
     };
-    img.src = objUrl;
+    qrImg.src = objUrl;
   }
 
   return (
@@ -78,8 +124,14 @@ export function QrModal({ open, onClose, station }: { open: boolean; onClose: ()
       }
     >
       <div className="flex flex-col items-center">
-        <div ref={ref} className="rounded-2xl border border-line bg-white p-4">
-          <QRCode value={url} size={184} fgColor="#0B1420" bgColor="#FFFFFF" />
+        <div ref={ref} className="relative grid place-items-center rounded-2xl border border-line bg-white p-4">
+          <QRCode value={url} size={200} level="H" fgColor="#0B1420" bgColor="#FFFFFF" />
+          {/* Center brand mark */}
+          <span className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl bg-white p-[5px]">
+            <span className="flex items-center justify-center rounded-md bg-sidebar px-2.5 py-1.5">
+              <NextImage src="/brand/logo-white.png" alt="EVCHARGEX" width={72} height={11} />
+            </span>
+          </span>
         </div>
         <p className="nums mt-4 text-[14px] font-semibold text-ink">{station.code}</p>
         <p className="nums mt-1 break-all text-center text-[12px] text-faint">{url}</p>
@@ -89,6 +141,17 @@ export function QrModal({ open, onClose, station }: { open: boolean; onClose: ()
       </div>
     </Modal>
   );
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
 }
 
 export function BmsModal({ open, onClose, bay, stationCode }: { open: boolean; onClose: () => void; bay: Bay | null; stationCode: string }) {
