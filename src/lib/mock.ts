@@ -260,6 +260,41 @@ export const CONSOLE_LOGINS: import("./types").ConsoleLogin[] = [
   { id: "l3", email: "ops@evitpl.com", role: "Fleet operator", orgLabel: "EVI Pilot Fleet", lastSignIn: "05 Oct 2026, 11:33 am", status: "active" },
 ];
 
+// ---- Revenue ----
+export const REVENUE_KPIS = { revenue: 124500, paidSwaps: 842, activeSubs: 31, outstanding: 4200 };
+
+export const REVENUE_TREND = Array.from({ length: 30 }, (_, i) => ({
+  day: new Date(2026, 8, 22 + i).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }),
+  amount: Math.round(2500 + 2200 * Math.abs(Math.sin(i / 3)) + (i > 18 ? 1500 : 0)),
+}));
+
+export const REVENUE_BY_PLAN = [
+  { plan: "Unlimited Monthly", amount: 59976, color: "#1E63F0" },
+  { plan: "Pay As You Go", amount: 41258, color: "#F59E0B" },
+  { plan: "One-off swaps", amount: 18271, color: "#8B5CF6" },
+  { plan: "Standard Monthly", amount: 4995, color: "#16A34A" },
+];
+
+export type TxnStatus = "paid" | "pending" | "refunded";
+export const RECENT_TRANSACTIONS: { id: string; date: string; rider: string; description: string; amount: number; status: TxnStatus }[] = [
+  { id: "TXN-10428", date: iso(60 * 2), rider: "Rahul", description: "Unlimited Monthly · renewal", amount: 2499, status: "paid" },
+  { id: "TXN-10427", date: iso(60 * 5), rider: "Neha Sharma", description: "Pay As You Go · swap", amount: 49, status: "paid" },
+  { id: "TXN-10426", date: iso(60 * 9), rider: "Amit Verma", description: "Wallet top-up", amount: 500, status: "paid" },
+  { id: "TXN-10425", date: iso(60 * 26), rider: "Manoj", description: "Standard Monthly · renewal", amount: 999, status: "paid" },
+  { id: "TXN-10424", date: iso(60 * 30), rider: "Sameer Khan", description: "Pay As You Go · swap", amount: 49, status: "pending" },
+  { id: "TXN-10423", date: iso(60 * 44), rider: "RAHUL Soni", description: "Unlimited Monthly · renewal", amount: 2499, status: "paid" },
+  { id: "TXN-10422", date: iso(60 * 52), rider: "Riplav", description: "Pay As You Go · swap", amount: 49, status: "refunded" },
+  { id: "TXN-10421", date: iso(60 * 70), rider: "Saurabh", description: "Wallet top-up", amount: 300, status: "paid" },
+  { id: "TXN-10420", date: iso(60 * 80), rider: "Shahbaz Idrishi", description: "Pay As You Go · swap", amount: 49, status: "paid" },
+  { id: "TXN-10419", date: iso(60 * 96), rider: "Alice Tester", description: "Unlimited Monthly · renewal", amount: 2499, status: "paid" },
+  { id: "TXN-10418", date: iso(60 * 108), rider: "Neha Sharma", description: "Pay As You Go · swap", amount: 49, status: "paid" },
+  { id: "TXN-10417", date: iso(60 * 120), rider: "Rahul", description: "Wallet top-up", amount: 1000, status: "paid" },
+  { id: "TXN-10416", date: iso(60 * 138), rider: "Amit Verma", description: "Pay As You Go · swap", amount: 49, status: "pending" },
+  { id: "TXN-10415", date: iso(60 * 150), rider: "Manoj", description: "Pay As You Go · swap", amount: 49, status: "paid" },
+  { id: "TXN-10414", date: iso(60 * 168), rider: "RAHUL Soni", description: "Wallet top-up", amount: 500, status: "paid" },
+  { id: "TXN-10413", date: iso(60 * 180), rider: "Sameer Khan", description: "Standard Monthly · renewal", amount: 999, status: "paid" },
+];
+
 // ---- Organisation stats (for the Organisations table) ----
 export const ORG_STATS: Record<string, { description: string; stations: number; riders: number; vehicles: number; batteries: number; createdAt: string }> = {
   evipilot: { description: "Pilot fleet for EVI operations", stations: 2, riders: 31, vehicles: 17, batteries: 18, createdAt: "06 Aug 2026, 10:30 am" },
