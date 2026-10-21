@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, RefreshCw, Download, Pencil, Upload, Check, FileText, CheckCircle2, Users, Coins } from "lucide-react";
+import Link from "next/link";
+import { Plus, RefreshCw, Download, Pencil, ExternalLink, Check, FileText, CheckCircle2, Users, Coins } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card } from "@/components/ui/card";
@@ -77,7 +78,7 @@ export default function PlansPage() {
               <TR><TD className="py-10 text-center text-muted">No plans match your search.</TD><TD /><TD /><TD /><TD /><TD /><TD /><TD /><TD /></TR>
             ) : rows.map((p) => (
               <TR key={p.id}>
-                <TD className="text-[14px] font-semibold text-ink">{p.name}</TD>
+                <TD><Link href={`/plans/${p.id}`} className="text-[14px] font-semibold text-ink hover:text-brand-600">{p.name}</Link></TD>
                 <TD align="right" className="nums font-semibold text-ink">{formatInr(p.price)}</TD>
                 <TD>{p.period}</TD>
                 <TD>{p.shared ? <span className="rounded-md bg-brand-50 px-2 py-0.5 text-[12px] font-semibold text-brand-700">Shared template</span> : <span className="font-medium">{p.orgLabel}</span>}</TD>
@@ -93,7 +94,7 @@ export default function PlansPage() {
                 <TD>{p.createdAt}</TD>
                 <TD align="right">
                   <div className="flex items-center justify-end gap-1.5">
-                    <Button variant="secondary" size="sm" onClick={() => show(p.name, { description: `${formatInr(p.price)} · ${p.period} · ${p.subscribers} subscribers`, tone: "info" })}><Upload className="h-3.5 w-3.5" /> View</Button>
+                    <Link href={`/plans/${p.id}`} className="inline-flex h-8 items-center gap-1 rounded-xl border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-canvas">Open <ExternalLink className="h-3 w-3" /></Link>
                     <EditPlanDialog name={p.name} price={String(p.price)} period={p.period} />
                     <RowMenu
                       items={[

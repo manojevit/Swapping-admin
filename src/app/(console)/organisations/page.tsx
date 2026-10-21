@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, RefreshCw, Download, Eye, Pencil, Building2, CheckCircle2, Radio, Users } from "lucide-react";
+import Link from "next/link";
+import { Plus, RefreshCw, Download, ExternalLink, Pencil, Building2, CheckCircle2, Radio, Users } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card } from "@/components/ui/card";
@@ -10,21 +11,18 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
-import { Modal } from "@/components/ui/modal";
 import { RowMenu } from "@/components/ui/row-menu";
 import { useToast } from "@/components/ui/toast";
 import { ORGS, ORG_STATS } from "@/lib/mock";
 import { exportCsv } from "@/lib/utils";
 
 type Org = (typeof ORGS)[number];
-type OrgStat = (typeof ORG_STATS)[string];
 
 export default function OrganisationsPage() {
   const { show } = useToast();
   const [query, setQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("All cities");
   const [refreshing, setRefreshing] = useState(false);
-  const [detail, setDetail] = useState<{ o: Org; s: OrgStat } | null>(null);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -89,7 +87,7 @@ export default function OrganisationsPage() {
               return (
                 <TR key={o.id}>
                   <TD>
-                    <p className="text-[14px] font-semibold text-ink">{o.name}</p>
+                    <Link href={`/organisations/${o.id}`} className="text-[14px] font-semibold text-ink hover:text-brand-600">{o.name}</Link>
                     <p className="text-[12px] text-faint">{s.description}</p>
                   </TD>
                   <TD><span className="rounded-md bg-brand-50 px-2 py-0.5 text-[12px] font-semibold text-brand-700">{o.code}</span></TD>
@@ -101,7 +99,7 @@ export default function OrganisationsPage() {
                   <TD><StatusPill tone="success">Active</StatusPill></TD>
                   <TD>{s.createdAt}</TD>
                   <TD align="right">
-                    <OrgRowActions o={o} s={s} onView={() => setDetail({ o, s })} show={show} />
+                    <OrgRowActions o={o} show={show} />
                   </TD>
                 </TR>
               );
@@ -110,62 +108,24 @@ export default function OrganisationsPage() {
         </Table>
         <p className="px-5 py-3 text-[12px] text-faint">Showing {rows.length} of {ORGS.length} organisations</p>
       </Card>
-
-      <OrgDetailsModal data={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }
 
-function OrgRowActions({ o, s, onView, show }: { o: Org; s: OrgStat; onView: () => void; show: (t: string, opts?: { description?: string; tone?: "success" | "info" | "warn" }) => void }) {
+function OrgRowActions({ o, show }: { o: Org; show: (t: string, opts?: { description?: string; tone?: "success" | "info" | "warn" }) => void }) {
   return (
     <div className="flex items-center justify-end gap-1.5">
-      <Button variant="secondary" size="sm" onClick={onView}><Eye className="h-3.5 w-3.5" /></Button>
+      <Link href={`/organisations/${o.id}`} className="inline-flex h-8 items-center gap-1 rounded-xl border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-canvas">
+        Open <ExternalLink className="h-3 w-3" />
+      </Link>
       <EditOrgDialog name={o.name} code={o.code} city={o.city} />
       <RowMenu
         items={[
-          { label: "View details", onClick: onView },
           { label: "Download report", onClick: () => show("Report queued", { description: `${o.name} · organisation report` }) },
-          { label: "Deactivate", onClick: () => show("Organisation deactivated", { description: o.name, tone: "warn" }) },
+          { label: "Archive", onClick: () => show("Organisation archived", { description: o.name, tone: "warn" }) },
           { label: "Delete organisation", danger: true, divider: true, onClick: () => show("Organisation deleted", { description: o.name, tone: "warn" }) },
         ]}
       />
-    </div>
-  );
-}
-
-function OrgDetailsModal({ data, onClose }: { data: { o: Org; s: OrgStat } | null; onClose: () => void }) {
-  if (!data) return null;
-  const { o, s } = data;
-  return (
-    <Modal open onClose={onClose} icon={<Building2 className="h-5 w-5" />} title={o.name} description={s.description}
-      footer={<Button variant="secondary" onClick={onClose}>Close</Button>}>
-      <div className="space-y-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-md bg-brand-50 px-2 py-0.5 text-[12px] font-semibold text-brand-700">{o.code}</span>
-          <StatusPill tone="success">Active</StatusPill>
-          <span className="text-[13px] text-muted">{o.city}</span>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <OrgMetric label="Stations" value={s.stations} />
-          <OrgMetric label="Riders" value={s.riders} />
-          <OrgMetric label="Vehicles" value={s.vehicles} />
-          <OrgMetric label="Batteries" value={s.batteries} />
-        </div>
-        <div className="space-y-2.5 rounded-xl border border-line p-4 text-[13px]">
-          <div className="flex items-center justify-between"><span className="text-muted">Organisation code</span><span className="nums font-semibold text-ink">{o.code}</span></div>
-          <div className="flex items-center justify-between"><span className="text-muted">City</span><span className="font-semibold text-ink">{o.city}</span></div>
-          <div className="flex items-center justify-between"><span className="text-muted">Created</span><span className="font-semibold text-ink">{s.createdAt}</span></div>
-        </div>
-      </div>
-    </Modal>
-  );
-}
-
-function OrgMetric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-xl border border-line p-3">
-      <p className="text-[11px] font-medium text-faint">{label}</p>
-      <p className="nums mt-1 text-[22px] font-bold text-ink">{value}</p>
     </div>
   );
 }
