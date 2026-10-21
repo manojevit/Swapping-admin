@@ -16,7 +16,7 @@ import { QrModal } from "@/components/dashboard/station-modals";
 import { useToast } from "@/components/ui/toast";
 import { STATIONS, ORGS, getStationDetail } from "@/lib/mock";
 import { useSession } from "@/lib/session";
-import { exportCsv, timeAgo } from "@/lib/utils";
+import { exportCsv } from "@/lib/utils";
 import type { StationDetail, StationStatus } from "@/lib/types";
 
 const TONE: Record<StationStatus, "success" | "danger" | "warn" | "neutral"> = {
@@ -126,13 +126,12 @@ export default function StationsPage() {
             <TH>Organisation</TH>
             <TH>Location</TH>
             <TH>Bays</TH>
-            <TH>Last seen</TH>
             <TH>Status</TH>
             <TH align="right">Actions</TH>
           </THead>
           <TBody>
             {filtered.length === 0 ? (
-              <TR><TD className="py-10 text-center text-muted">No stations match your filters.</TD><TD /><TD /><TD /><TD /><TD /><TD /></TR>
+              <TR><TD className="py-10 text-center text-muted">No stations match your filters.</TD><TD /><TD /><TD /><TD /><TD /></TR>
             ) : filtered.map((s) => (
               <TR key={s.id}>
                 <TD>
@@ -149,7 +148,6 @@ export default function StationsPage() {
                     <span className="text-[12px] text-faint">· {s.readyPacks} ready</span>
                   </div>
                 </TD>
-                <TD>{timeAgo(s.lastSeen)}</TD>
                 <TD><StatusPill tone={TONE[s.status]}>{LABEL[s.status]}</StatusPill></TD>
                 <TD align="right">
                   <div className="flex items-center justify-end gap-1.5">

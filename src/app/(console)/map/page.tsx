@@ -14,7 +14,7 @@ import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { useToast } from "@/components/ui/toast";
 import { STATIONS, ORGS } from "@/lib/mock";
 import { useSession } from "@/lib/session";
-import { cn, exportCsv, timeAgo } from "@/lib/utils";
+import { cn, exportCsv } from "@/lib/utils";
 import type { Station, StationStatus } from "@/lib/types";
 
 const NetworkMap = dynamic(() => import("@/components/dashboard/network-map"), {
@@ -151,7 +151,6 @@ export default function MapPage() {
               <p className="mt-2 flex items-center gap-1.5 text-[13px] text-muted"><MapPin className="h-3.5 w-3.5 text-faint" />{selected.location}</p>
 
               <dl className="mt-4 space-y-3 text-[13px]">
-                <Row label="Last seen" value={timeAgo(selected.lastSeen)} />
                 <Row label="Organisation" value={orgName(selected.orgId)} />
                 <div className="flex items-center justify-between">
                   <dt className="text-muted">Bays</dt>
@@ -188,11 +187,11 @@ export default function MapPage() {
         <div className="mt-4">
           <Table>
             <THead>
-              <TH>Station</TH><TH>Organisation</TH><TH>Location</TH><TH>Status</TH><TH>Bays</TH><TH>Last seen</TH><TH align="right">Faults</TH><TH align="right">Action</TH>
+              <TH>Station</TH><TH>Organisation</TH><TH>Location</TH><TH>Status</TH><TH>Bays</TH><TH align="right">Faults</TH><TH align="right">Action</TH>
             </THead>
             <TBody>
               {shown.length === 0 ? (
-                <TR><TD className="py-10 text-center text-muted">No stations match your filters.</TD><TD /><TD /><TD /><TD /><TD /><TD /><TD /></TR>
+                <TR><TD className="py-10 text-center text-muted">No stations match your filters.</TD><TD /><TD /><TD /><TD /><TD /><TD /></TR>
               ) : shown.map((s) => (
                 <TR key={s.id}>
                   <TD>
@@ -203,7 +202,6 @@ export default function MapPage() {
                   <TD>{s.location}</TD>
                   <TD><StatusPill tone={TONE[s.status]}>{s.status[0].toUpperCase() + s.status.slice(1)}</StatusPill></TD>
                   <TD><BayBar full={s.baysFull} total={s.baysTotal} tone={s.status === "offline" ? "offline" : "auto"} /></TD>
-                  <TD>{timeAgo(s.lastSeen)}</TD>
                   <TD align="right" className="nums font-semibold"><span className={s.faults > 0 ? "text-danger" : "text-muted"}>{s.faults}</span></TD>
                   <TD align="right">
                     <Link href={`/stations/${s.id}`} className="inline-flex h-8 items-center gap-1 rounded-xl border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-canvas">Open <ExternalLink className="h-3 w-3" /></Link>

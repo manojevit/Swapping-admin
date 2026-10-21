@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { StatusPill } from "@/components/ui/status-pill";
 import { BayBar } from "@/components/ui/bay-bar";
 import { Button } from "@/components/ui/button";
-import { exportCsv, timeAgo } from "@/lib/utils";
+import { exportCsv } from "@/lib/utils";
 import type { StationStatus } from "@/lib/types";
 
 const STATUS_TONE: Record<StationStatus, "success" | "danger" | "warn" | "neutral"> = {
@@ -90,14 +90,13 @@ export function StationsTable() {
               <th className="px-3 py-2.5 font-semibold">Location</th>
               <th className="px-3 py-2.5 font-semibold">Bays</th>
               <th className="px-3 py-2.5 font-semibold">Status</th>
-              <th className="px-3 py-2.5 font-semibold">Last seen</th>
               <th className="px-3 py-2.5 font-semibold">Faults</th>
               <th className="px-5 py-2.5 text-right font-semibold">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {rows.length === 0 ? (
-              <tr><td colSpan={8} className="px-5 py-10 text-center text-[13px] text-muted">No stations match your filters.</td></tr>
+              <tr><td colSpan={7} className="px-5 py-10 text-center text-[13px] text-muted">No stations match your filters.</td></tr>
             ) : rows.map((s) => (
               <tr key={s.id} className="hover:bg-canvas/60">
                 <td className="px-5 py-3.5">
@@ -112,7 +111,6 @@ export function StationsTable() {
                 <td className="px-3 py-3.5">
                   <StatusPill tone={STATUS_TONE[s.status]}>{STATUS_LABEL[s.status]}</StatusPill>
                 </td>
-                <td className="px-3 py-3.5 text-[13px] text-muted">{timeAgo(s.lastSeen)}</td>
                 <td className="nums px-3 py-3.5 text-[13px] font-semibold">
                   <span className={s.faults > 0 ? "text-danger" : "text-muted"}>{s.faults}</span>
                 </td>
