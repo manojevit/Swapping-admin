@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, RefreshCw, Download, Pencil, MoreVertical, Crown, Users, Eye, Check, Minus } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, RefreshCw, Download, Pencil, Crown, Users, Eye, Check, Minus } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,11 +9,42 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { Toolbar, FilterSelect } from "@/components/ui/toolbar";
 import { FormDialog, Field, SelectField } from "@/components/ui/form-dialog";
+import { RowMenu } from "@/components/ui/row-menu";
+import { useToast } from "@/components/ui/toast";
 import { CONSOLE_LOGINS, ORGS } from "@/lib/mock";
+import { exportCsv } from "@/lib/utils";
 
 const ROLE_TONE = { Administrator: "info", "Fleet operator": "neutral", Viewer: "neutral" } as const;
 
 export default function ConsoleLoginsPage() {
+  const { show } = useToast();
+  const [query, setQuery] = useState("");
+  const [orgFilter, setOrgFilter] = useState("All organisations");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const rows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return CONSOLE_LOGINS.filter((l) => {
+      if (q && !`${l.email} ${l.role}`.toLowerCase().includes(q)) return false;
+      if (orgFilter !== "All organisations" && l.orgLabel !== orgFilter) return false;
+      return true;
+    });
+  }, [query, orgFilter]);
+
+  function refresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    setTimeout(() => { setRefreshing(false); show("Logins refreshed"); }, 700);
+  }
+  function handleExport() {
+    exportCsv(
+      "console-logins.csv",
+      ["Email", "Role", "Organisation", "Last signed in", "Status"],
+      rows.map((l) => [l.email, l.role, l.orgLabel, l.lastSignIn, "Active"]),
+    );
+    show("Logins exported", { description: `${rows.length} ${rows.length === 1 ? "row" : "rows"} · console-logins.csv` });
+  }
+
   return (
     <div>
       <PageHeader
@@ -24,8 +56,10 @@ export default function ConsoleLoginsPage() {
 
       <Toolbar
         placeholder="Search email, name…"
-        filters={<FilterSelect label="Organisation" options={["All organisations", ...ORGS.map((o) => o.name)]} />}
-        actions={<><Button variant="secondary"><RefreshCw className="h-4 w-4" /> Refresh</Button><Button variant="secondary"><Download className="h-4 w-4" /> Export</Button></>}
+        search={query}
+        onSearch={setQuery}
+        filters={<FilterSelect label="Organisation" value={orgFilter} onChange={setOrgFilter} options={["All organisations", "Every organisation", ...ORGS.map((o) => o.name)]} />}
+        actions={<><Button variant="secondary" onClick={refresh} disabled={refreshing}><RefreshCw className={refreshing ? "h-4 w-4 animate-spin" : "h-4 w-4"} /> Refresh</Button><Button variant="secondary" onClick={handleExport}><Download className="h-4 w-4" /> Export</Button></>}
       />
 
       <Card className="mt-4">
@@ -34,7 +68,9 @@ export default function ConsoleLoginsPage() {
             <TH>Email</TH><TH>Role</TH><TH>Organisation</TH><TH>Last signed in</TH><TH>Status</TH><TH align="right">Actions</TH>
           </THead>
           <TBody>
-            {CONSOLE_LOGINS.map((l) => (
+            {rows.length === 0 ? (
+              <TR><TD className="py-10 text-center text-muted">No logins match your search.</TD><TD /><TD /><TD /><TD /><TD /></TR>
+            ) : rows.map((l) => (
               <TR key={l.id}>
                 <TD className="font-medium text-ink">{l.email}</TD>
                 <TD><StatusPill tone={ROLE_TONE[l.role]} dot={false}>{l.role}</StatusPill></TD>
@@ -44,14 +80,20 @@ export default function ConsoleLoginsPage() {
                 <TD align="right">
                   <div className="flex items-center justify-end gap-1.5">
                     <EditLoginDialog email={l.email} role={l.role} />
-                    <Button variant="secondary" size="sm"><MoreVertical className="h-3.5 w-3.5" /></Button>
+                    <RowMenu
+                      items={[
+                        { label: "Resend invite", onClick: () => show("Invite resent", { description: l.email }) },
+                        { label: "Reset password", onClick: () => show("Password reset link sent", { description: l.email }) },
+                        { label: "Suspend access", danger: true, divider: true, onClick: () => show("Login suspended", { description: l.email, tone: "warn" }) },
+                      ]}
+                    />
                   </div>
                 </TD>
               </TR>
             ))}
           </TBody>
         </Table>
-        <p className="px-5 py-3 text-[12px] text-faint">{CONSOLE_LOGINS.length} logins</p>
+        <p className="px-5 py-3 text-[12px] text-faint">Showing {rows.length} of {CONSOLE_LOGINS.length} logins</p>
       </Card>
 
       {/* Role permissions */}
