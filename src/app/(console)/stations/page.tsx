@@ -44,7 +44,7 @@ export default function StationsPage() {
         subtitle="Manage and monitor battery swapping stations"
         actions={
           can("manage_stations") ? (
-            <FormDialog trigger={<><Plus className="h-4 w-4" /> Add station</>} title="Add station" description="Register a new swapping station." submitLabel="Add station">
+            <FormDialog icon={<Radio className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Add station</>} title="Add station" description="Register a new swapping station." submitLabel="Add station">
               <Field label="Station code" placeholder="e.g. EVX-PKL-0002" required />
               <Field label="Display name" placeholder="e.g. EVX-SECTOR 20" />
               <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
@@ -114,7 +114,7 @@ export default function StationsPage() {
                   <div className="flex items-center justify-end gap-1.5">
                     <Button variant="secondary" size="sm"><QrCode className="h-3.5 w-3.5" /> QR</Button>
                     <Button variant="secondary" size="sm"><KeyRound className="h-3.5 w-3.5" /> Key</Button>
-                    <FormDialog trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${s.code}`} submitLabel="Save changes">
+                    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${s.code}`} description="Update station details." submitLabel="Save changes">
                       <Field label="Display name" defaultValue={s.name} />
                       <Field label="Location" defaultValue={s.location} />
                       <SelectField label="Status" options={["Online", "Offline", "Maintenance"]} defaultValue={LABEL[s.status]} />

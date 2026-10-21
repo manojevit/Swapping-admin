@@ -75,7 +75,7 @@ export default function PlansPage() {
 
 function NewPlanDialog() {
   return (
-    <FormDialog trigger={<><Plus className="h-4 w-4" /> New plan</>} title="New plan" description="Create a subscription plan for your network." submitLabel="Create plan">
+    <FormDialog icon={<FileText className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> New plan</>} title="New plan" description="Create a subscription plan for your network." submitLabel="Create plan">
       <Field label="Plan name" placeholder="e.g. Unlimited Monthly" required />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (₹)" type="number" placeholder="2499" required />
@@ -89,7 +89,7 @@ function NewPlanDialog() {
 
 function EditPlanDialog({ name, price, period }: { name: string; price: string; period: string }) {
   return (
-    <FormDialog trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} submitLabel="Save changes">
+    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} description="Update plan details." submitLabel="Save changes">
       <Field label="Plan name" defaultValue={name} />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (₹)" type="number" defaultValue={price} />

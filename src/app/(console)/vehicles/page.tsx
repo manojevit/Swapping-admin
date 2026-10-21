@@ -35,7 +35,7 @@ export default function VehiclesPage() {
           can("manage_vehicles") ? (
             <>
               <Button variant="secondary" size="lg"><Upload className="h-4 w-4" /> Bulk upload</Button>
-              <FormDialog trigger={<><Plus className="h-4 w-4" /> Add vehicle</>} title="Add vehicle" description="Register a vehicle to the fleet." submitLabel="Add vehicle">
+              <FormDialog icon={<Bike className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Add vehicle</>} title="Add vehicle" description="Register a vehicle to the fleet." submitLabel="Add vehicle">
                 <Field label="Vehicle code" placeholder="e.g. EVX-010" required />
                 <Field label="Chassis number" placeholder="SESEAG032600..." required />
                 <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} />
@@ -108,7 +108,12 @@ export default function VehiclesPage() {
                 <TD align="right">
                   <div className="flex items-center justify-end gap-1.5">
                     <Button variant="secondary" size="sm"><Link2 className="h-3.5 w-3.5" /> {v.rider ? "Reassign" : "Assign"}</Button>
-                    <Button variant="secondary" size="sm"><Pencil className="h-3.5 w-3.5" /> Edit</Button>
+                    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${v.code}`} description={`Update ${v.id} details.`} submitLabel="Save changes">
+                      <Field label="Vehicle code" defaultValue={v.code} />
+                      <Field label="Chassis number" defaultValue={v.chassis} />
+                      <SelectField label="Model" options={["SHEMA LS", "SHEMA", "SHEMA EAGLE"]} defaultValue={v.model} />
+                      <SelectField label="Status" options={["On road", "Off road"]} defaultValue={v.status === "on_road" ? "On road" : "Off road"} />
+                    </FormDialog>
                   </div>
                 </TD>
               </TR>

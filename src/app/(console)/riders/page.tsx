@@ -32,7 +32,7 @@ export default function RidersPage() {
         subtitle="Manage and monitor registered riders"
         actions={
           can("manage_riders") ? (
-            <FormDialog trigger={<><Plus className="h-4 w-4" /> Add rider</>} title="Add rider" description="Register a new rider on the network." submitLabel="Add rider">
+            <FormDialog icon={<Users className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> Add rider</>} title="Add rider" description="Register a new rider on the network." submitLabel="Add rider">
               <Field label="Full name" placeholder="e.g. Rahul Kumar" required />
               <Field label="Phone number" placeholder="+91 ..." required />
               <SelectField label="Organisation" options={ORGS.map((o) => o.name)} />
@@ -101,7 +101,7 @@ export default function RidersPage() {
                 <TD align="right" className="nums font-semibold text-ink">{r.swaps}</TD>
                 <TD><StatusPill tone={r.swapAllowed ? "success" : "danger"}>{r.swapAllowed ? "Allowed" : "Blocked"}</StatusPill></TD>
                 <TD align="right">
-                  <FormDialog trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} submitLabel="Save changes">
+                  <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title={`Edit ${r.name}`} description={`Update ${r.id} details.`} submitLabel="Save changes">
                     <Field label="Full name" defaultValue={r.name} />
                     <Field label="Phone number" defaultValue={r.phone} />
                     <Field label="City" defaultValue={r.city ?? ""} />

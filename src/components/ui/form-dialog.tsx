@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { X, Check, ChevronDown } from "lucide-react";
 import { Button, type ButtonProps } from "./button";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ export function FormDialog({
   trigger,
   triggerVariant = "primary",
   triggerSize = "lg",
+  icon,
   title,
   description,
   submitLabel = "Save",
@@ -22,6 +23,7 @@ export function FormDialog({
   trigger: ReactNode;
   triggerVariant?: ButtonProps["variant"];
   triggerSize?: ButtonProps["size"];
+  icon?: ReactNode;
   title: string;
   description?: string;
   submitLabel?: string;
@@ -58,23 +60,30 @@ export function FormDialog({
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center">
-          <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-line bg-surface shadow-pop">
-            <div className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
-              <div>
-                <h2 className="text-[16px] font-bold text-ink">{title}</h2>
+          <div className="animate-fade absolute inset-0 bg-ink/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div className="animate-pop relative z-10 w-full max-w-lg overflow-hidden rounded-2xl bg-surface shadow-pop ring-1 ring-black/5">
+            {/* Header */}
+            <div className="flex items-start gap-3 px-6 pb-5 pt-6">
+              {icon ? (
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">{icon}</span>
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <h2 className="text-[17px] font-bold text-ink">{title}</h2>
                 {description ? <p className="mt-0.5 text-[13px] text-muted">{description}</p> : null}
               </div>
-              <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-lg text-faint hover:bg-black/5 hover:text-ink">
+              <button type="button" onClick={() => setOpen(false)} className="-mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg text-faint transition-colors hover:bg-black/5 hover:text-ink">
                 <X className="h-4 w-4" />
               </button>
             </div>
+
             <form onSubmit={submit}>
-              <div className="max-h-[60vh] space-y-4 overflow-y-auto px-5 py-5">{children}</div>
-              <div className="flex items-center justify-end gap-2 border-t border-line px-5 py-4">
+              <div className="scroll-slim max-h-[62vh] space-y-4 overflow-y-auto border-t border-line px-6 py-5">
+                {children}
+              </div>
+              <div className="flex items-center justify-end gap-2 border-t border-line bg-canvas/50 px-6 py-4">
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-                <Button type="submit" variant="primary" className={cn(saved && "pointer-events-none")}>
-                  {saved ? "Saved ✓" : submitLabel}
+                <Button type="submit" variant="primary" className={cn(saved && "pointer-events-none bg-success hover:bg-success")}>
+                  {saved ? <><Check className="h-4 w-4" /> Saved</> : submitLabel}
                 </Button>
               </div>
             </form>
@@ -86,26 +95,39 @@ export function FormDialog({
 }
 
 const control =
-  "h-10 w-full rounded-xl border border-line bg-canvas px-3 text-[13px] text-ink placeholder:text-faint focus:border-brand-300 focus:bg-surface focus:outline-none";
+  "h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-[14px] text-ink placeholder:text-faint transition-colors hover:border-black/15 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/15";
 
-export function Field({ label, placeholder, type = "text", defaultValue, required }: { label: string; placeholder?: string; type?: string; defaultValue?: string; required?: boolean }) {
+function Label({ children, required }: { children: ReactNode; required?: boolean }) {
+  return (
+    <span className="mb-1.5 block text-[13px] font-medium text-ink">
+      {children}
+      {required ? <span className="text-brand-600"> *</span> : null}
+    </span>
+  );
+}
+
+export function Field({ label, placeholder, type = "text", defaultValue, required, hint }: { label: string; placeholder?: string; type?: string; defaultValue?: string; required?: boolean; hint?: string }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-faint">{label}{required ? " *" : ""}</span>
+      <Label required={required}>{label}</Label>
       <input type={type} placeholder={placeholder} defaultValue={defaultValue} className={control} />
+      {hint ? <span className="mt-1.5 block text-[12px] text-faint">{hint}</span> : null}
     </label>
   );
 }
 
-export function SelectField({ label, options, defaultValue }: { label: string; options: string[]; defaultValue?: string }) {
+export function SelectField({ label, options, defaultValue, required }: { label: string; options: string[]; defaultValue?: string; required?: boolean }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-faint">{label}</span>
-      <select defaultValue={defaultValue} className={control}>
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
+      <Label required={required}>{label}</Label>
+      <span className="relative block">
+        <select defaultValue={defaultValue} className={cn(control, "cursor-pointer appearance-none pr-10")}>
+          {options.map((o) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
+      </span>
     </label>
   );
 }

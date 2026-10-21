@@ -34,4 +34,16 @@
   .scroll-slim::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  /* Dialog entrance */
+  @keyframes evx-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes evx-pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-fade { animation: evx-fade 0.15s ease-out; }
+  .animate-pop { animation: evx-pop 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
 }

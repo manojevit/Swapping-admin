@@ -80,7 +80,7 @@ export default function OrganisationsPage() {
 
 function NewOrgDialog() {
   return (
-    <FormDialog trigger={<><Plus className="h-4 w-4" /> New organisation</>} title="New organisation" description="Register a fleet organisation on the network." submitLabel="Create organisation">
+    <FormDialog icon={<Building2 className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> New organisation</>} title="New organisation" description="Register a fleet organisation on the network." submitLabel="Create organisation">
       <Field label="Organisation name" placeholder="e.g. EVI Pilot Fleet" required />
       <Field label="Code" placeholder="e.g. EVIPILOT" required />
       <Field label="City" placeholder="e.g. Panchkula" />
@@ -91,7 +91,7 @@ function NewOrgDialog() {
 
 function EditOrgDialog({ name, code, city }: { name: string; code: string; city: string }) {
   return (
-    <FormDialog trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} submitLabel="Save changes">
+    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<Pencil className="h-3.5 w-3.5" />} triggerVariant="secondary" triggerSize="sm" title={`Edit ${name}`} description="Update organisation details." submitLabel="Save changes">
       <Field label="Organisation name" defaultValue={name} />
       <Field label="Code" defaultValue={code} />
       <Field label="City" defaultValue={city} />

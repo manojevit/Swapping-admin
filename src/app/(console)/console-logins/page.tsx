@@ -111,7 +111,7 @@ function RoleCard({ icon, tone, title, badge, blurb, can, cannot }: { icon: Reac
 
 function NewLoginDialog() {
   return (
-    <FormDialog trigger={<><Plus className="h-4 w-4" /> New login</>} title="New console login" description="Invite an admin or operator to the console." submitLabel="Create login">
+    <FormDialog icon={<Users className="h-5 w-5" />} trigger={<><Plus className="h-4 w-4" /> New login</>} title="New console login" description="Invite an admin or operator to the console." submitLabel="Create login">
       <Field label="Email" type="email" placeholder="name@evitpl.com" required />
       <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} />
       <SelectField label="Organisation" options={["Every organisation", ...ORGS.map((o) => o.name)]} />
@@ -121,7 +121,7 @@ function NewLoginDialog() {
 
 function EditLoginDialog({ email, role }: { email: string; role: string }) {
   return (
-    <FormDialog trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title="Edit login" submitLabel="Save changes">
+    <FormDialog icon={<Pencil className="h-5 w-5" />} trigger={<><Pencil className="h-3.5 w-3.5" /> Edit</>} triggerVariant="secondary" triggerSize="sm" title="Edit login" description="Update role and access." submitLabel="Save changes">
       <Field label="Email" type="email" defaultValue={email} />
       <SelectField label="Role" options={["Administrator", "Fleet operator", "Viewer"]} defaultValue={role} />
       <SelectField label="Status" options={["Active", "Inactive"]} />
