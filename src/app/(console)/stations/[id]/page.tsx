@@ -109,7 +109,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
           </div>
           <p className="mt-1 max-w-3xl text-[14px] text-muted">{station.name} · {station.address}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary" onClick={() => setQrOpen(true)}><QrCode className="h-4 w-4" /> QR</Button>
           <Button variant="secondary" onClick={() => setQrOpen(true)}><FileDown className="h-4 w-4" /> SVG</Button>
           {can("manage_stations") ? (

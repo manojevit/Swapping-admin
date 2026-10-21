@@ -2,24 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { navForRole } from "@/lib/nav";
 import { useSession } from "@/lib/session";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 
-export function Sidebar() {
+export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const { user } = useSession();
   const groups = navForRole(user.role);
   const initial = user.name.charAt(0).toUpperCase();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-[244px] flex-col bg-sidebar text-white">
+    <>
+      {/* Mobile backdrop */}
+      {open ? <div className="fixed inset-0 z-30 bg-ink/50 backdrop-blur-sm lg:hidden" onClick={onClose} /> : null}
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 flex w-[244px] flex-col bg-sidebar text-white transition-transform duration-200 lg:z-30 lg:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
       {/* Brand */}
-      <div className="px-5 pb-4 pt-6">
-        <Logo tone="light" width={150} />
-        <p className="mt-2 text-[10px] font-semibold tracking-[0.22em] text-sidebar-muted">CONSOLE</p>
+      <div className="flex items-start justify-between px-5 pb-4 pt-6">
+        <div>
+          <Logo tone="light" width={150} />
+          <p className="mt-2 text-[10px] font-semibold tracking-[0.22em] text-sidebar-muted">CONSOLE</p>
+        </div>
+        <button onClick={onClose} className="-mr-1 grid h-8 w-8 place-items-center rounded-lg text-sidebar-muted hover:bg-sidebar-hover hover:text-white lg:hidden" aria-label="Close menu">
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Nav */}
@@ -76,6 +90,7 @@ export function Sidebar() {
           </Link>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
