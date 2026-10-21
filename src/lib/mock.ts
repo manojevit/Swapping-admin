@@ -95,6 +95,7 @@ function buildBays(station: Station): import("./types").Bay[] {
     else state = "empty";
 
     const filled = state === "charged" || state === "charging";
+    const sohs = [96, 88, 82, 97, 76, 91, 85, 79, 93];
     bays.push({
       index: i,
       state,
@@ -103,7 +104,7 @@ function buildBays(station: Station): import("./types").Bay[] {
       voltage: filled ? (state === "charged" ? 53.5 : 54.1) : null,
       current: filled ? (state === "charging" ? 15.6 : 0.0) : null,
       temp: filled ? (state === "charging" ? 38 : 40) : null,
-      soh: null,
+      soh: filled ? sohs[(i - 1) % sohs.length] : state === "faulted" ? 64 : null,
       flap: "closed",
     });
   }
@@ -131,6 +132,8 @@ export function getStationDetail(id: string): import("./types").StationDetail | 
     address: meta.address,
     locationId: station.code,
     installedOn: meta.installedOn,
+    firmware: "v2.4.1",
+    firmwareLatest: "v2.5.0",
     bays: buildBays(station),
     commands: station.status === "offline" ? [] : SAMPLE_COMMANDS,
     lastSwap: lastSwapRow

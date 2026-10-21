@@ -82,6 +82,8 @@ export interface StationDetail extends Station {
   address: string;
   locationId: string;
   installedOn: string;
+  firmware: string;
+  firmwareLatest: string;
   bays: Bay[];
   commands: StationCommand[];
   lastSwap: {
