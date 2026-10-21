@@ -59,10 +59,14 @@ src/
 
 - [x] **Phase 0** — shell, role system, design tokens, mock layer, shared primitives
 - [x] **Phase 1** — Overview
-- [ ] **Phase 2** — Stations, Batteries, Riders, Vehicles, Swap Report, Alerts (list screens)
-- [ ] **Phase 3** — Station detail (bays/BMS) + Station controls
-- [ ] **Phase 4** — Analytics, Revenue, Network Map
-- [ ] **Phase 5** — Admin (Organisations, Plans, Console logins) + Login page + add/edit modals + detail drill-downs
+- [x] **Phase 2** — Stations, Batteries, Riders, Vehicles, Swap Report, Alerts (list screens)
+- [x] **Phase 3** — Station detail (bays/BMS) + Station controls
+- [x] **Phase 4** — Analytics, Revenue, Network Map (real Leaflet/OpenStreetMap)
+- [x] **Phase 5** — Admin (Organisations, Plans, Console logins) + Login page + add/edit dialogs
+
+All approved screens are now built. The map uses Leaflet + OpenStreetMap tiles
+(no API key). Create/edit dialogs are frontend-only (no persistence) — wire them
+to the API alongside `src/lib/mock.ts`. + detail drill-downs
 
 ## Wiring a real API
 
