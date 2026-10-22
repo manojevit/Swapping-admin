@@ -205,6 +205,18 @@ export const ALERTS: Alert[] = [
   { id: "al5", severity: "info", title: "Maintenance required", detail: "Scheduled maintenance due soon", sourceLabel: "EVX-ZRK-0002", orgId: "evipilot", raisedAt: iso(60 * 52), status: "resolved" },
 ];
 
+// ---- Support tickets (raised by riders in the app, surfaced here) ----
+export const TICKETS: import("./types").Ticket[] = [
+  { id: "TKT-2048", rider: "Rahul", phone: "+91 98341 71856", subject: "Swap failed but wallet was charged", message: "I tapped to swap at EVX-PKL-0001 bay 5, the flap opened but no pack came out and ₹49 was deducted. Please refund.", category: "Swap failed", orgId: "evipilot", raisedAt: iso(60 * 1.5), status: "open" },
+  { id: "TKT-2047", rider: "Neha Sharma", phone: "+91 93681 24512", subject: "App crashes on the map screen", message: "Every time I open the station map the app freezes and closes. Using an Android phone.", category: "App bug", orgId: "evipilot", raisedAt: iso(60 * 4), status: "open" },
+  { id: "TKT-2046", rider: "Amit Verma", phone: "+91 93420 72097", subject: "Battery drains too fast", message: "The last two packs I got from Gurugram drop to 20% within 30 km. Can you check their health?", category: "Battery issue", orgId: "evipilot", raisedAt: iso(60 * 9), status: "in_progress" },
+  { id: "TKT-2045", rider: "Sanchit", phone: "+91 95596 67672", subject: "Station always offline", message: "EVX-ZRK-0002 near my home has been offline for 3 days. When will it be fixed?", category: "Station issue", orgId: "evipilot", raisedAt: iso(60 * 20), status: "open" },
+  { id: "TKT-2044", rider: "Manoj", phone: "+91 78265 41845", subject: "Wrong plan charged", message: "I'm on Standard Monthly but I was charged the Unlimited price this month.", category: "Billing", orgId: "evipilot", raisedAt: iso(60 * 30), status: "in_progress" },
+  { id: "TKT-2043", rider: "Budhi Lal", phone: "+91 73967 16363", subject: "Cannot update phone number", message: "The app shows an error when I try to change my registered mobile number.", category: "App bug", orgId: "evipilot", raisedAt: iso(60 * 44), status: "resolved" },
+  { id: "TKT-2042", rider: "Aadesh Kumar", phone: "+91 84686 28792", subject: "QR not scanning at station", message: "The sticker QR at Faridabad won't scan, had to enter the code manually twice.", category: "Station issue", orgId: "evipilot", raisedAt: iso(60 * 70), status: "resolved" },
+  { id: "TKT-2041", rider: "Saurabh", phone: "+91 97800 57480", subject: "Refund not received", message: "A failed swap refund from last week still hasn't reached my wallet.", category: "Billing", orgId: "evit", raisedAt: iso(60 * 96), status: "open" },
+];
+
 // ---- Analytics ----
 export const ANALYTICS_KPIS = {
   totalSwaps: { value: "1,284", delta: 8.4, up: true },

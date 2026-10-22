@@ -167,6 +167,20 @@ export interface Alert {
   status: AlertStatus;
 }
 
+export type TicketStatus = "open" | "in_progress" | "resolved";
+
+export interface Ticket {
+  id: string;
+  rider: string;
+  phone: string;
+  subject: string;
+  message: string;
+  category: string;
+  orgId: string;
+  raisedAt: string;
+  status: TicketStatus;
+}
+
 export interface ActivityItem {
   id: string;
   kind: "swap_completed" | "battery_returned" | "station_offline" | "rider_registered" | "swap_failed";
