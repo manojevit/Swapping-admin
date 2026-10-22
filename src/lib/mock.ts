@@ -313,79 +313,43 @@ export const ORG_STATS: Record<string, { description: string; stations: number; 
   evit: { description: "EVIT organisation network", stations: 4, riders: 1, vehicles: 0, batteries: 0, createdAt: "08 Aug 2026, 11:45 am" },
 };
 
-// ---- Firmware (OTA images + per-station versions) ----
-// "Board" = the controller inside a cabinet the image targets. The container's
-// own header declares board/version/length/CRC; the server checks the upload
-// against the declared board before accepting it.
-export type FirmwareBoard = "station" | "slot" | "gateway" | "bootloader";
-
-export const FIRMWARE_BOARDS: { value: FirmwareBoard; label: string }[] = [
-  { value: "station", label: "Station controller" },
-  { value: "slot", label: "Slot board" },
-  { value: "gateway", label: "Gateway" },
-  { value: "bootloader", label: "Bootloader" },
-];
-
-// Newest station-controller build that exists in this fleet. A station on an
-// older station firmware is flagged "behind".
+// ---- Firmware ----
+// Deliberately simple: a station runs one firmware VERSION. The newest version
+// we've released is FIRMWARE_LATEST; any station on an older one can be updated.
 export const FIRMWARE_LATEST = "0.7.3";
 
-export interface FirmwareImage {
-  id: string;
+export interface FirmwareVersion {
   version: string;
-  board: FirmwareBoard;
-  bytes: number;
-  crc: string; // CRC32 from the container header
-  uploadedBy: string;
-  uploadedAt: string; // ISO
-  notes: string;
+  releasedAt: string; // ISO
+  whatsNew: string;
+  latest?: boolean;
 }
 
-export const FIRMWARE_IMAGES: FirmwareImage[] = [
-  { id: "fw_0073_station", version: "0.7.3", board: "station", bytes: 1_148_928, crc: "0x9A3F21C7", uploadedBy: "Mohzzam", uploadedAt: iso(60 * 20), notes: "Faster cold-start, flap retry on bay timeout" },
-  { id: "fw_0072_station", version: "0.7.2", board: "station", bytes: 1_142_784, crc: "0x41BE07D2", uploadedBy: "Mohzzam", uploadedAt: iso(60 * 24 * 9), notes: "Heartbeat backoff fix" },
-  { id: "fw_0040_slot", version: "0.4.0", board: "slot", bytes: 262_144, crc: "0x7C55E910", uploadedBy: "AKM", uploadedAt: iso(60 * 24 * 12), notes: "SoH read calibration" },
-  { id: "fw_0017_gateway", version: "0.1.7", board: "gateway", bytes: 524_288, crc: "0x2D18BB4A", uploadedBy: "AKM", uploadedAt: iso(60 * 24 * 21), notes: "LTE reconnect window widened" },
-  { id: "fw_0010_bootloader", version: "0.1.0", board: "bootloader", bytes: 65_536, crc: "0xE4490F38", uploadedBy: "Mohzzam", uploadedAt: iso(60 * 24 * 40), notes: "Signed-image enforcement" },
+// Released firmware versions, newest first. Plain-language "what's new".
+export const FIRMWARE_VERSIONS: FirmwareVersion[] = [
+  { version: "0.7.3", releasedAt: iso(60 * 20), whatsNew: "Faster start-up, and the station retries on its own if a bay is slow to open.", latest: true },
+  { version: "0.7.2", releasedAt: iso(60 * 24 * 9), whatsNew: "Fixed stations occasionally dropping off the network." },
+  { version: "0.7.0", releasedAt: iso(60 * 24 * 25), whatsNew: "More accurate battery-health readings." },
+  { version: "0.2.0", releasedAt: iso(60 * 24 * 80), whatsNew: "First field release." },
 ];
 
-export type FirmwareJobStatus = "downloading" | "installing" | "done" | "failed" | "scheduled";
-
-export interface FirmwareJob {
-  id: string;
-  stationCode: string;
-  orgName: string;
-  image: string; // "station 0.7.3"
-  status: FirmwareJobStatus;
-  progress: number; // 0-100
-  startedAt: string; // ISO
-  note: string;
-}
-
-export const FIRMWARE_JOBS: FirmwareJob[] = [
-  { id: "job_5120", stationCode: "EVX-PKL-0001", orgName: "EVI Pilot Fleet", image: "station 0.7.3", status: "installing", progress: 82, startedAt: iso(14), note: "Waiting for bays to clear before reboot" },
-  { id: "job_5119", stationCode: "EVIT-HYT-001", orgName: "EVIT ORG", image: "station 0.7.3", status: "downloading", progress: 46, startedAt: iso(22), note: "Transfer in progress" },
-  { id: "job_5118", stationCode: "EVIT-HYT-004", orgName: "EVIT ORG", image: "gateway 0.1.7", status: "done", progress: 100, startedAt: iso(60 * 3), note: "Installed, verified on reboot" },
-  { id: "job_5117", stationCode: "EVIT-HYT-002", orgName: "EVIT ORG", image: "station 0.7.3", status: "failed", progress: 0, startedAt: iso(60 * 5), note: "Station offline — no transfer started" },
-  { id: "job_5116", stationCode: "EVX-ZRK-0002", orgName: "EVI Pilot Fleet", image: "slot 0.4.0", status: "scheduled", progress: 0, startedAt: iso(-60 * 6), note: "Install held until 02:00 IST" },
-];
-
-export interface FirmwareFleetRow {
+// Per-station firmware. version === null means the station hasn't reported in
+// (treated as offline). updatingTo + progress are set while an update runs.
+export interface StationFirmware {
   stationCode: string;
   stationName: string;
   orgName: string;
-  stationFw: string | null; // null = never reported
-  bootloader: string | null;
-  gateway: string | null;
-  slotVersions: string[]; // distinct slot-board versions seen in the cabinet
-  lastSeen: string; // ISO
+  version: string | null;
+  updatingTo?: string;
+  progress?: number; // 0-100, only while updating
+  lastUpdated: string; // ISO
 }
 
-export const FIRMWARE_FLEET: FirmwareFleetRow[] = [
-  { stationCode: "EVX-PKL-0001", stationName: "EVX-PANCHKULA", orgName: "EVI Pilot Fleet", stationFw: "0.7.3", bootloader: "0.1.0", gateway: "0.1.7", slotVersions: ["0.4.0"], lastSeen: iso(3) },
-  { stationCode: "EVIT-HYT-001", stationName: "EVIT-HYT-001", orgName: "EVIT ORG", stationFw: "0.7.3", bootloader: "0.1.0", gateway: "0.1.7", slotVersions: ["0.4.0", "0.3.9"], lastSeen: iso(2) },
-  { stationCode: "EVIT-HYT-004", stationName: "EVIT-HYT-004", orgName: "EVIT ORG", stationFw: "0.7.2", bootloader: "0.1.0", gateway: "0.1.7", slotVersions: ["0.4.0"], lastSeen: iso(180) },
-  { stationCode: "EVX-ZRK-0002", stationName: "EVX-PEER MUCHALLA", orgName: "EVI Pilot Fleet", stationFw: "0.2.0", bootloader: "0.1.0", gateway: "0.1.2", slotVersions: ["0.4.0"], lastSeen: iso(10) },
-  { stationCode: "EVIT-HYT-003", stationName: "EVIT-HYT-003", orgName: "EVIT ORG", stationFw: "0.2.0", bootloader: "0.1.0", gateway: "0.1.2", slotVersions: ["0.3.9"], lastSeen: iso(60) },
-  { stationCode: "EVIT-HYT-002", stationName: "EVIT-HYT-002", orgName: "EVIT ORG", stationFw: null, bootloader: null, gateway: null, slotVersions: [], lastSeen: iso(60 * 24 * 28) },
+export const STATION_FIRMWARE: StationFirmware[] = [
+  { stationCode: "EVX-PKL-0001", stationName: "EVX-PANCHKULA", orgName: "EVI Pilot Fleet", version: "0.7.2", updatingTo: "0.7.3", progress: 82, lastUpdated: iso(14) },
+  { stationCode: "EVIT-HYT-001", stationName: "EVIT-HYT-001", orgName: "EVIT ORG", version: "0.7.3", lastUpdated: iso(60 * 20) },
+  { stationCode: "EVIT-HYT-004", stationName: "EVIT-HYT-004", orgName: "EVIT ORG", version: "0.7.2", lastUpdated: iso(60 * 24 * 2) },
+  { stationCode: "EVX-ZRK-0002", stationName: "EVX-PEER MUCHALLA", orgName: "EVI Pilot Fleet", version: "0.2.0", lastUpdated: iso(60 * 24 * 6) },
+  { stationCode: "EVIT-HYT-003", stationName: "EVIT-HYT-003", orgName: "EVIT ORG", version: "0.2.0", lastUpdated: iso(60 * 24 * 10) },
+  { stationCode: "EVIT-HYT-002", stationName: "EVIT-HYT-002", orgName: "EVIT ORG", version: null, lastUpdated: iso(60 * 24 * 28) },
 ];
