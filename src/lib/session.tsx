@@ -31,6 +31,9 @@ export type Permission =
   | "manage_organisations"
   | "manage_plans"
   | "manage_console_logins"
+  | "manage_firmware"
+  | "view_analytics"
+  | "view_revenue"
   | "view_all_orgs";
 
 const ADMIN_PERMS: Permission[] = [
@@ -43,6 +46,9 @@ const ADMIN_PERMS: Permission[] = [
   "manage_organisations",
   "manage_plans",
   "manage_console_logins",
+  "manage_firmware",
+  "view_analytics",
+  "view_revenue",
   "view_all_orgs",
 ];
 

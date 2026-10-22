@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { useToast } from "@/components/ui/toast";
+import { NoAccess } from "@/components/layout/no-access";
+import { useSession } from "@/lib/session";
 import { cn, exportCsv } from "@/lib/utils";
 import {
   ANALYTICS_KPIS, ANALYTICS_SUBSTATS, SWAPS_PER_DAY, STATION_PERFORMANCE, BATTERY_HEALTH_TREND, ANALYTICS_INSIGHTS,
@@ -19,6 +21,7 @@ const tip = { borderRadius: 12, border: "1px solid #E7EBF1", boxShadow: "0 8px 2
 
 export default function AnalyticsPage() {
   const { show } = useToast();
+  const { can } = useSession();
   const [range, setRange] = useState("30 days");
   const [downloadOpen, setDownloadOpen] = useState(false);
   const maxSwaps = Math.max(...STATION_PERFORMANCE.map((s) => s.swaps));
@@ -98,6 +101,8 @@ export default function AnalyticsPage() {
     doc.save("analytics-report.pdf");
     show("PDF report downloaded", { description: "analytics-report.pdf" });
   }
+
+  if (!can("view_analytics")) return <NoAccess title="Analytics" subtitle="Network-wide swapping performance and insights." />;
 
   return (
     <div>

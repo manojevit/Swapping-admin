@@ -14,6 +14,7 @@ import {
   Building2,
   ScrollText,
   KeyRound,
+  Cpu,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,13 +56,14 @@ export const NAV: NavGroup[] = [
     items: [
       { label: "Swap Report", href: "/swaps", icon: ArrowLeftRight },
       { label: "Support", href: "/support", icon: LifeBuoy },
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
-      { label: "Revenue", href: "/revenue", icon: Wallet },
+      { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["admin"] },
+      { label: "Revenue", href: "/revenue", icon: Wallet, roles: ["admin"] },
     ],
   },
   {
     heading: "Admin",
     items: [
+      { label: "Firmware", href: "/firmware", icon: Cpu, roles: ["admin"] },
       { label: "Organisations", href: "/organisations", icon: Building2, roles: ["admin"] },
       { label: "Plans", href: "/plans", icon: ScrollText, roles: ["admin"] },
       { label: "Console logins", href: "/console-logins", icon: KeyRound, roles: ["admin"] },

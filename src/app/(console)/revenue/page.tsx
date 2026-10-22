@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { useToast } from "@/components/ui/toast";
+import { NoAccess } from "@/components/layout/no-access";
+import { useSession } from "@/lib/session";
 import { REVENUE_KPIS, REVENUE_TREND, REVENUE_BY_PLAN, RECENT_TRANSACTIONS, type TxnStatus } from "@/lib/mock";
 import { cn, exportCsv, formatInr, timeAgo } from "@/lib/utils";
 
@@ -17,6 +19,7 @@ const TXN_LABEL: Record<TxnStatus, string> = { paid: "Paid", pending: "Pending",
 
 export default function RevenuePage() {
   const { show } = useToast();
+  const { can } = useSession();
   const [range, setRange] = useState("30 days");
   const [refreshing, setRefreshing] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -78,6 +81,8 @@ export default function RevenuePage() {
     doc.save("revenue-report.pdf");
     show("PDF report downloaded", { description: "revenue-report.pdf" });
   }
+
+  if (!can("view_revenue")) return <NoAccess title="Revenue" subtitle="Network revenue from subscriptions and battery swaps." />;
 
   return (
     <div>
