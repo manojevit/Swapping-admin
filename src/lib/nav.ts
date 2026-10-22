@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   BarChart3,
   Wallet,
+  LifeBuoy,
   Building2,
   ScrollText,
   KeyRound,
@@ -53,6 +54,7 @@ export const NAV: NavGroup[] = [
     heading: "Operations",
     items: [
       { label: "Swap Report", href: "/swaps", icon: ArrowLeftRight },
+      { label: "Support", href: "/support", icon: LifeBuoy },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
       { label: "Revenue", href: "/revenue", icon: Wallet },
     ],
