@@ -225,7 +225,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
           <div className="space-y-3">
             {/* Uptime & connectivity */}
             <Card className="p-4">
-              <div className="flex items-center gap-2"><Wifi className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Uptime &amp; connectivity</h3></div>
+              <div className="flex items-center gap-2"><Wifi className="h-4 w-4 text-muted" /><h3 className="text-[13px] font-semibold text-ink">Uptime &amp; connectivity</h3></div>
               <p className="nums mt-2 text-[22px] font-bold leading-none text-ink">{uptimePct}%</p>
               <p className="mt-1 text-[12px] text-faint">Last heartbeat {timeAgo(station.lastSeen)}</p>
               <div className="mt-2.5 flex items-end gap-[3px]">
@@ -239,7 +239,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
             {/* Open alerts */}
             <Card className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><TriangleAlert className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Open alerts</h3></div>
+                <div className="flex items-center gap-2"><TriangleAlert className="h-4 w-4 text-muted" /><h3 className="text-[13px] font-semibold text-ink">Open alerts</h3></div>
                 {stationAlerts.length > 0 ? <span className="rounded-full bg-danger-soft px-2 py-0.5 text-[11px] font-bold text-danger-ink">{stationAlerts.length}</span> : null}
               </div>
               {stationAlerts.length === 0 ? (
@@ -283,7 +283,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
             {/* Battery health */}
             <Card className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><HeartPulse className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Pack health (SoH)</h3></div>
+                <div className="flex items-center gap-2"><HeartPulse className="h-4 w-4 text-muted" /><h3 className="text-[13px] font-semibold text-ink">Pack health (SoH)</h3></div>
                 <span className="nums text-[13px] font-semibold text-ink">avg {avgSoh}%</span>
               </div>
               <div className="mt-3 space-y-2.5">
@@ -296,7 +296,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
             {/* Location */}
             <Card className="overflow-hidden">
               <div className="flex items-center justify-between px-4 pt-4">
-                <div className="flex items-center gap-2"><MapIcon className="h-4 w-4 text-brand-600" /><h3 className="text-[13px] font-semibold text-ink">Location</h3></div>
+                <div className="flex items-center gap-2"><MapIcon className="h-4 w-4 text-muted" /><h3 className="text-[13px] font-semibold text-ink">Location</h3></div>
                 <a href={`https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[12px] font-semibold text-brand-600 hover:text-brand-700">
                   <Navigation className="h-3.5 w-3.5" /> Directions
                 </a>
@@ -314,7 +314,7 @@ export default function StationDetailPage({ params }: { params: { id: string } }
                 <Info icon={<Building2 className="h-4 w-4" />} label="Organisation" value={orgName} />
                 <Info icon={<CalendarDays className="h-4 w-4" />} label="Installed on" value={station.installedOn} />
                 <div className="flex items-start gap-2.5">
-                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600"><Cpu className="h-4 w-4" /></span>
+                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink/[0.045] text-muted"><Cpu className="h-4 w-4" /></span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[12px] font-medium text-faint">Firmware</p>
                     <p className="mt-0.5 flex items-center gap-2 text-[13px] text-ink">
@@ -392,7 +392,7 @@ function SohRow({ color, label, value, total }: { color: string; label: string; 
 function Info({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
-      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600">{icon}</span>
+      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink/[0.045] text-muted">{icon}</span>
       <div className="min-w-0">
         <p className="text-[12px] font-medium text-faint">{label}</p>
         <p className="mt-0.5 text-[13px] leading-snug text-ink">{value}</p>

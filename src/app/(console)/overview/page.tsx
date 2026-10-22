@@ -85,7 +85,7 @@ export default function OverviewPage() {
                         className={cn("flex w-full items-center justify-between px-3.5 py-2 text-left text-[13px] hover:bg-canvas", r.key === range.key ? "font-semibold text-ink" : "text-muted")}
                       >
                         {r.label}
-                        {r.key === range.key ? <Check className="h-4 w-4 text-brand-600" /> : null}
+                        {r.key === range.key ? <Check className="h-4 w-4 text-muted" /> : null}
                       </button>
                     ))}
                   </div>

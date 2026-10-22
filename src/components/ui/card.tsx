@@ -24,7 +24,7 @@ export function CardHeader({
     <div className="flex items-start justify-between gap-3 px-5 pt-5">
       <div className="flex items-start gap-3">
         {icon ? (
-          <span className="mt-0.5 grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
+          <span className="mt-0.5 grid h-9 w-9 place-items-center rounded-xl bg-ink/[0.045] text-muted">
             {icon}
           </span>
         ) : null}

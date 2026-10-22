@@ -232,7 +232,7 @@ export default function AnalyticsPage() {
         </Card>
 
         <Card className="p-5">
-          <div className="flex items-center gap-2"><Lightbulb className="h-4 w-4 text-brand-600" /><h3 className="text-[15px] font-semibold text-ink">Insights</h3></div>
+          <div className="flex items-center gap-2"><Lightbulb className="h-4 w-4 text-muted" /><h3 className="text-[15px] font-semibold text-ink">Insights</h3></div>
           <div className="mt-4 space-y-3">
             {ANALYTICS_INSIGHTS.map((ins, i) => (
               <div key={i} className="rounded-xl border border-line bg-canvas/50 p-3">
@@ -258,7 +258,7 @@ function AnalyticKpi({ icon, label, value, delta, up }: { icon: React.ReactNode;
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2.5">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">{icon}</span>
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-ink/[0.045] text-muted">{icon}</span>
         <span className="text-[12px] font-semibold uppercase tracking-wide text-faint">{label}</span>
       </div>
       <p className="nums mt-3 text-[26px] font-bold leading-none text-ink">{value}</p>

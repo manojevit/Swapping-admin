@@ -170,7 +170,7 @@ export default function MapPage() {
             </div>
           ) : (
             <div className="py-10 text-center">
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600"><MapPin className="h-6 w-6" /></span>
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-ink/[0.045] text-muted"><MapPin className="h-6 w-6" /></span>
               <p className="mt-3 text-[14px] font-semibold text-ink">Select a station</p>
               <p className="mt-1 text-[13px] text-muted">Click a pin on the map to see its live details.</p>
             </div>
@@ -180,7 +180,7 @@ export default function MapPage() {
 
       <Card className="mt-4">
         <div className="flex items-center gap-2 px-5 pt-5">
-          <Radio className="h-4 w-4 text-brand-600" />
+          <Radio className="h-4 w-4 text-muted" />
           <h3 className="text-[15px] font-semibold text-ink">Stations in view</h3>
           <span className="text-[13px] text-muted">· {shown.length} {shown.length === 1 ? "station" : "stations"}</span>
         </div>

@@ -233,7 +233,7 @@ function BulkUploadModal({ open, onClose }: { open: boolean; onClose: () => void
         onClick={() => inputRef.current?.click()}
         className="flex w-full flex-col items-center gap-2 rounded-xl border border-dashed border-line bg-canvas/40 px-4 py-8 text-center transition-colors hover:border-brand-300 hover:bg-canvas"
       >
-        <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600"><FileUp className="h-5 w-5" /></span>
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink/[0.045] text-muted"><FileUp className="h-5 w-5" /></span>
         <span className="text-[13px] font-semibold text-ink">{file ? file.name : "Choose a CSV file"}</span>
         <span className="text-[12px] text-faint">{file ? "Click to replace" : "or drag and drop here"}</span>
         <input ref={inputRef} type="file" accept=".csv" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />

@@ -190,7 +190,7 @@ export default function RevenuePage() {
 }
 
 function Kpi({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub: string; tone: "brand" | "success" | "violet" | "warn" }) {
-  const tones = { brand: "bg-brand-50 text-brand-600", success: "bg-success-soft text-success-ink", violet: "bg-violet-100 text-violet-600", warn: "bg-warn-soft text-warn-ink" };
+  const tones = { brand: "bg-ink/[0.045] text-muted", success: "bg-success-soft text-success-ink", violet: "bg-ink/[0.045] text-muted", warn: "bg-warn-soft text-warn-ink" };
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2.5">

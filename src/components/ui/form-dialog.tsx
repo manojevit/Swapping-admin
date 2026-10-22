@@ -65,7 +65,7 @@ export function FormDialog({
             {/* Header */}
             <div className="flex items-start gap-3 px-6 pb-5 pt-6">
               {icon ? (
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">{icon}</span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ink/[0.045] text-muted">{icon}</span>
               ) : null}
               <div className="min-w-0 flex-1">
                 <h2 className="text-[17px] font-bold text-ink">{title}</h2>

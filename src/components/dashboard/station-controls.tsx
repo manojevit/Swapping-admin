@@ -117,7 +117,7 @@ export function StationControls({ station }: { station: StationDetail }) {
 
       <Card>
         <div className="flex items-center gap-2 px-5 pt-5">
-          <RefreshCw className="h-4 w-4 text-brand-600" />
+          <RefreshCw className="h-4 w-4 text-muted" />
           <h3 className="text-[15px] font-semibold text-ink">Commands sent to this cabinet</h3>
         </div>
         <div className="mt-4">

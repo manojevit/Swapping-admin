@@ -43,7 +43,7 @@ export function Modal({
       <div className="animate-fade absolute inset-0 bg-ink/50 backdrop-blur-sm" onClick={onClose} />
       <div className={`animate-pop relative z-10 w-full overflow-hidden rounded-2xl bg-surface shadow-pop ring-1 ring-black/5 ${width}`}>
         <div className="flex items-start gap-3 px-6 pb-5 pt-6">
-          {icon ? <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">{icon}</span> : null}
+          {icon ? <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ink/[0.045] text-muted">{icon}</span> : null}
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] font-bold text-ink">{title}</h2>
             {description ? <p className="mt-0.5 text-[13px] text-muted">{description}</p> : null}

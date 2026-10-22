@@ -73,7 +73,7 @@ export default function OrganisationDetailPage({ params }: { params: { id: strin
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.8fr_1fr]">
         <Card>
           <div className="flex items-center gap-2 px-5 pt-5">
-            <Radio className="h-4 w-4 text-brand-600" />
+            <Radio className="h-4 w-4 text-muted" />
             <h3 className="text-[15px] font-semibold text-ink">Stations</h3>
             <span className="text-[13px] text-muted">· {stations.length}</span>
           </div>
@@ -133,7 +133,7 @@ export default function OrganisationDetailPage({ params }: { params: { id: strin
 function Info({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
-      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600">{icon}</span>
+      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink/[0.045] text-muted">{icon}</span>
       <div className="min-w-0">
         <p className="text-[12px] font-medium text-faint">{label}</p>
         <p className="mt-0.5 text-[13px] leading-snug text-ink">{value}</p>

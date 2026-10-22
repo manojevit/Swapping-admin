@@ -42,7 +42,7 @@ export function ComingSoon({
     <div>
       <PageHeader title={title} subtitle={subtitle} />
       <div className="grid place-items-center rounded-2xl border border-dashed border-line bg-surface py-24 text-center shadow-card">
-        <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+        <span className="grid h-14 w-14 place-items-center rounded-2xl bg-ink/[0.045] text-muted">
           <Hammer className="h-6 w-6" />
         </span>
         <p className="mt-4 text-[15px] font-semibold text-ink">Screen designed — build queued</p>
